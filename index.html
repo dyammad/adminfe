@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão da Igreja</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="sample-data.js"></script>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <i class="fas fa-church"></i>
+                <h2>Sistema de Gestão da Igreja</h2>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="login-btn">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-church"></i>
+                <h3>Igreja</h3>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" data-section="dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="menu-section">
+                    <span>Membros</span>
+                    <ul>
+                        <li><a href="#" data-section="members-active"><i class="fas fa-users"></i> Ativos</a></li>
+                        <li><a href="#" data-section="members-inactive"><i class="fas fa-user-slash"></i> Inativos</a></li>
+                        <li><a href="#" data-section="members-visitors"><i class="fas fa-user-plus"></i> Visitantes</a></li>
+                    </ul>
+                </li>
+                <li><a href="#" data-section="ministries"><i class="fas fa-hands-praying"></i> Ministérios</a></li>
+                <li><a href="#" data-section="leaders"><i class="fas fa-crown"></i> Líderes</a></li>
+                <li><a href="#" data-section="cells"><i class="fas fa-home"></i> Células</a></li>
+                <li><a href="#" data-section="events"><i class="fas fa-calendar"></i> Eventos</a></li>
+                <li><a href="#" data-section="pastor-agenda"><i class="fas fa-calendar-check"></i> Agenda Pastor</a></li>
+                <li><a href="#" data-section="treasury"><i class="fas fa-coins"></i> Tesouraria</a></li>
+                <li><a href="#" data-section="prayer-requests"><i class="fas fa-praying-hands"></i> Pedidos de Oração</a></li>
+                <li><a href="#" data-section="baptisms"><i class="fas fa-water"></i> Batismos</a></li>
+                <li><a href="#" data-section="donations"><i class="fas fa-heart"></i> Doações</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="user-info">
+                    <span id="currentUser">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h3 id="totalMembers">0</h3>
+                                <p>Total de Membros</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                            <div class="stat-info">
+                                <h3 id="activeMembers">0</h3>
+                                <p>Membros Ativos</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-home"></i></div>
+                            <div class="stat-info">
+                                <h3 id="totalCells">0</h3>
+                                <p>Células</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                            <div class="stat-info">
+                                <h3 id="monthlyOffering">R$ 0</h3>
+                                <p>Ofertas do Mês</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Crescimento de Membros</h3>
+                            <canvas id="membersChart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Ofertas por Mês</h3>
+                            <canvas id="offeringsChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Members Sections -->
+                <section id="members-active" class="content-section">
+                    <div class="section-header">
+                        <h2>Membros Ativos</h2>
+                        <button class="btn btn-primary" onclick="openMemberModal()">
+                            <i class="fas fa-plus"></i> Adicionar Membro
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="activeMembersTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Data de Nascimento</th>
+                                    <th>Célula</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="members-inactive" class="content-section">
+                    <div class="section-header">
+                        <h2>Membros Inativos</h2>
+                    </div>
+                    <div class="table-container">
+                        <table id="inactiveMembersTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Data de Inativação</th>
+                                    <th>Motivo</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="members-visitors" class="content-section">
+                    <div class="section-header">
+                        <h2>Visitantes</h2>
+                        <button class="btn btn-primary" onclick="openVisitorModal()">
+                            <i class="fas fa-plus"></i> Adicionar Visitante
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="visitorsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Data da Visita</th>
+                                    <th>Como Conheceu</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Other sections will be loaded dynamically -->
+                <section id="ministries" class="content-section">
+                    <div class="section-header">
+                        <h2>Ministérios</h2>
+                        <button class="btn btn-primary" onclick="openMinistryModal()">
+                            <i class="fas fa-plus"></i> Adicionar Ministério
+                        </button>
+                    </div>
+                    <div class="ministries-grid" id="ministriesGrid"></div>
+                </section>
+
+                <!-- Leaders Section -->
+                <section id="leaders" class="content-section">
+                    <div class="section-header">
+                        <h2>Líderes</h2>
+                        <button class="btn btn-primary" onclick="openLeaderModal()">
+                            <i class="fas fa-plus"></i> Adicionar Líder
+                        </button>
+                    </div>
+                    <div class="leaders-grid" id="leadersGrid"></div>
+                </section>
+
+                <!-- Cells Section -->
+                <section id="cells" class="content-section">
+                    <div class="section-header">
+                        <h2>Células</h2>
+                        <button class="btn btn-primary" onclick="openCellModal()">
+                            <i class="fas fa-plus"></i> Adicionar Célula
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="cellsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Líder</th>
+                                    <th>Endereço</th>
+                                    <th>Dia da Semana</th>
+                                    <th>Horário</th>
+                                    <th>Membros</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Events Section -->
+                <section id="events" class="content-section">
+                    <div class="section-header">
+                        <h2>Eventos</h2>
+                        <button class="btn btn-primary" onclick="openEventModal()">
+                            <i class="fas fa-plus"></i> Adicionar Evento
+                        </button>
+                    </div>
+                    <div class="events-grid" id="eventsGrid"></div>
+                </section>
+
+                <!-- Pastor's Agenda Section -->
+                <section id="pastor-agenda" class="content-section">
+                    <div class="section-header">
+                        <h2>Agenda do Pastor</h2>
+                        <button class="btn btn-primary" onclick="openAgendaModal()">
+                            <i class="fas fa-plus"></i> Adicionar Compromisso
+                        </button>
+                    </div>
+                    <div class="agenda-container">
+                        <div class="calendar-view" id="pastorCalendar">
+                            <h3>Calendário</h3>
+                            <div class="calendar-placeholder">
+                                <i class="fas fa-calendar-alt" style="font-size: 48px; color: #bdc3c7; margin-bottom: 10px;"></i>
+                                <p>Visualização do calendário em desenvolvimento</p>
+                            </div>
+                        </div>
+                        <div class="agenda-list" id="agendaList"></div>
+                    </div>
+                    <div class="table-container" style="margin-top: 20px;">
+                        <table id="agendaTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Horário</th>
+                                    <th>Título</th>
+                                    <th>Descrição</th>
+                                    <th>Local</th>
+                                    <th>Prioridade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Treasury Section -->
+                <section id="treasury" class="content-section">
+                    <div class="section-header">
+                        <h2>Tesouraria</h2>
+                        <div>
+                            <button class="btn btn-success" onclick="openTransactionModal('income')">
+                                <i class="fas fa-plus"></i> Receita
+                            </button>
+                            <button class="btn btn-danger" onclick="openTransactionModal('expense')">
+                                <i class="fas fa-minus"></i> Despesa
+                            </button>
+                        </div>
+                    </div>
+                    <div class="treasury-summary">
+                        <div class="summary-card income">
+                            <h3>Receitas do Mês</h3>
+                            <span id="monthlyIncome">R$ 0,00</span>
+                        </div>
+                        <div class="summary-card expense">
+                            <h3>Despesas do Mês</h3>
+                            <span id="monthlyExpense">R$ 0,00</span>
+                        </div>
+                        <div class="summary-card balance">
+                            <h3>Saldo</h3>
+                            <span id="currentBalance">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="transactionsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrição</th>
+                                    <th>Tipo</th>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Prayer Requests Section -->
+                <section id="prayer-requests" class="content-section">
+                    <div class="section-header">
+                        <h2>Pedidos de Oração</h2>
+                        <button class="btn btn-primary" onclick="openPrayerModal()">
+                            <i class="fas fa-plus"></i> Adicionar Pedido
+                        </button>
+                    </div>
+                    <div class="prayer-filters">
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                        <button class="filter-btn" data-filter="pending">Pendentes</button>
+                        <button class="filter-btn" data-filter="answered">Respondidos</button>
+                    </div>
+                    <div class="prayer-requests-grid" id="prayerRequestsGrid"></div>
+                </section>
+
+                <!-- Baptisms Section -->
+                <section id="baptisms" class="content-section">
+                    <div class="section-header">
+                        <h2>Batismos</h2>
+                        <button class="btn btn-primary" onclick="openBaptismModal()">
+                            <i class="fas fa-plus"></i> Agendar Batismo
+                        </button>
+                    </div>
+                    <div class="baptism-stats">
+                        <div class="stat-item">
+                            <span class="number" id="totalBaptisms">0</span>
+                            <span class="label">Total de Batismos</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number" id="thisYearBaptisms">0</span>
+                            <span class="label">Este Ano</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="number" id="pendingBaptisms">0</span>
+                            <span class="label">Agendados</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="baptismsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Data do Batismo</th>
+                                    <th>Pastor</th>
+                                    <th>Local</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Donations Section -->
+                <section id="donations" class="content-section">
+                    <div class="section-header">
+                        <h2>Doações</h2>
+                        <button class="btn btn-primary" onclick="openDonationModal()">
+                            <i class="fas fa-plus"></i> Registrar Doação
+                        </button>
+                    </div>
+                    <div class="donations-summary">
+                        <div class="donation-type">
+                            <h3>Dízimos</h3>
+                            <span id="tithesTotal">R$ 0,00</span>
+                        </div>
+                        <div class="donation-type">
+                            <h3>Ofertas</h3>
+                            <span id="offeringsTotal">R$ 0,00</span>
+                        </div>
+                        <div class="donation-type">
+                            <h3>Doações Especiais</h3>
+                            <span id="specialDonationsTotal">R$ 0,00</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="donationsTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Doador</th>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Método</th>
+                                    <th>Observações</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Member Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="memberModalTitle">Adicionar Membro</h3>
+                <span class="close" onclick="closeMemberModal()">&times;</span>
+            </div>
+            <form id="memberForm">
+                <input type="hidden" id="memberId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberName">Nome Completo</label>
+                        <input type="text" id="memberName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberEmail">Email</label>
+                        <input type="email" id="memberEmail" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberPhone">Telefone</label>
+                        <input type="tel" id="memberPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberBirthdate">Data de Nascimento</label>
+                        <input type="date" id="memberBirthdate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberAddress">Endereço</label>
+                        <input type="text" id="memberAddress">
+                    </div>
+                    <div class="form-group">
+                        <label for="memberCell">Célula</label>
+                        <select id="memberCell">
+                            <option value="">Selecione uma célula</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeMemberModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ministry Modal -->
+    <div id="ministryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="ministryModalTitle">Adicionar Ministério</h3>
+                <span class="close" onclick="closeMinistryModal()">&times;</span>
+            </div>
+            <form id="ministryForm">
+                <input type="hidden" id="ministryId">
+                <div class="form-group">
+                    <label for="ministryName">Nome do Ministério</label>
+                    <input type="text" id="ministryName" required>
+                </div>
+                <div class="form-group">
+                    <label for="ministryDescription">Descrição</label>
+                    <textarea id="ministryDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ministryLeader">Líder</label>
+                    <input type="text" id="ministryLeader" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeMinistryModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leader Modal -->
+    <div id="leaderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="leaderModalTitle">Adicionar Líder</h3>
+                <span class="close" onclick="closeLeaderModal()">&times;</span>
+            </div>
+            <form id="leaderForm">
+                <input type="hidden" id="leaderId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="leaderName">Nome</label>
+                        <input type="text" id="leaderName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaderPosition">Posição</label>
+                        <input type="text" id="leaderPosition" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="leaderMinistry">Ministério</label>
+                        <select id="leaderMinistry" required>
+                            <option value="">Selecione um ministério</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="leaderPhone">Telefone</label>
+                        <input type="tel" id="leaderPhone" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeLeaderModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cell Modal -->
+    <div id="cellModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="cellModalTitle">Adicionar Célula</h3>
+                <span class="close" onclick="closeCellModal()">&times;</span>
+            </div>
+            <form id="cellForm">
+                <input type="hidden" id="cellId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cellName">Nome da Célula</label>
+                        <input type="text" id="cellName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cellLeader">Líder</label>
+                        <select id="cellLeader" required>
+                            <option value="">Selecione um líder</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cellAddress">Endereço</label>
+                    <input type="text" id="cellAddress" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cellDayOfWeek">Dia da Semana</label>
+                        <select id="cellDayOfWeek" required>
+                            <option value="">Selecione o dia</option>
+                            <option value="Segunda-feira">Segunda-feira</option>
+                            <option value="Terça-feira">Terça-feira</option>
+                            <option value="Quarta-feira">Quarta-feira</option>
+                            <option value="Quinta-feira">Quinta-feira</option>
+                            <option value="Sexta-feira">Sexta-feira</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cellTime">Horário</label>
+                        <input type="time" id="cellTime" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCellModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="eventModalTitle">Adicionar Evento</h3>
+                <span class="close" onclick="closeEventModal()">&times;</span>
+            </div>
+            <form id="eventForm">
+                <input type="hidden" id="eventId">
+                <div class="form-group">
+                    <label for="eventTitle">Título do Evento</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription">Descrição</label>
+                    <textarea id="eventDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="eventDate">Data</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTime">Horário</label>
+                        <input type="time" id="eventTime" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="eventLocation">Local</label>
+                    <input type="text" id="eventLocation" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEventModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Prayer Request Modal -->
+    <div id="prayerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="prayerModalTitle">Adicionar Pedido de Oração</h3>
+                <span class="close" onclick="closePrayerModal()">&times;</span>
+            </div>
+            <form id="prayerForm">
+                <input type="hidden" id="prayerId">
+                <div class="form-group">
+                    <label for="prayerRequester">Nome do Solicitante</label>
+                    <input type="text" id="prayerRequester" required>
+                </div>
+                <div class="form-group">
+                    <label for="prayerRequest">Pedido de Oração</label>
+                    <textarea id="prayerRequest" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="prayerDate">Data</label>
+                    <input type="date" id="prayerDate" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closePrayerModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Baptism Modal -->
+    <div id="baptismModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="baptismModalTitle">Agendar Batismo</h3>
+                <span class="close" onclick="closeBaptismModal()">&times;</span>
+            </div>
+            <form id="baptismForm">
+                <input type="hidden" id="baptismId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="baptismName">Nome</label>
+                        <input type="text" id="baptismName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="baptismDate">Data do Batismo</label>
+                        <input type="date" id="baptismDate" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="baptismPastor">Pastor</label>
+                        <input type="text" id="baptismPastor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="baptismLocation">Local</label>
+                        <input type="text" id="baptismLocation" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeBaptismModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="donationModalTitle">Registrar Doação</h3>
+                <span class="close" onclick="closeDonationModal()">&times;</span>
+            </div>
+            <form id="donationForm">
+                <input type="hidden" id="donationId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="donationDonor">Doador</label>
+                        <input type="text" id="donationDonor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationType">Tipo</label>
+                        <select id="donationType" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="tithe">Dízimo</option>
+                            <option value="offering">Oferta</option>
+                            <option value="special">Especial</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="donationAmount">Valor</label>
+                        <input type="number" id="donationAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationMethod">Método</label>
+                        <select id="donationMethod" required>
+                            <option value="">Selecione o método</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Transferência">Transferência</option>
+                            <option value="Cartão">Cartão</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="donationDate">Data</label>
+                    <input type="date" id="donationDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="donationNotes">Observações</label>
+                    <textarea id="donationNotes" rows="2"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeDonationModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Agenda Modal -->
+    <div id="agendaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="agendaModalTitle">Adicionar Compromisso</h3>
+                <span class="close" onclick="closeAgendaModal()">&times;</span>
+            </div>
+            <form id="agendaForm">
+                <input type="hidden" id="agendaId">
+                <div class="form-group">
+                    <label for="agendaTitle">Título</label>
+                    <input type="text" id="agendaTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="agendaDescription">Descrição</label>
+                    <textarea id="agendaDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="agendaDate">Data</label>
+                        <input type="date" id="agendaDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="agendaTime">Horário</label>
+                        <input type="time" id="agendaTime" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="agendaLocation">Local</label>
+                    <input type="text" id="agendaLocation">
+                </div>
+                <div class="form-group">
+                    <label for="agendaPriority">Prioridade</label>
+                    <select id="agendaPriority" required>
+                        <option value="">Selecione a prioridade</option>
+                        <option value="low">Baixa</option>
+                        <option value="medium">Média</option>
+                        <option value="high">Alta</option>
+                        <option value="urgent">Urgente</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeAgendaModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transactionModalTitle">Adicionar Transação</h3>
+                <span class="close" onclick="closeTransactionModal()">&times;</span>
+            </div>
+            <form id="transactionForm">
+                <input type="hidden" id="transactionId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transactionType">Tipo</label>
+                        <select id="transactionType" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="income">Receita</option>
+                            <option value="expense">Despesa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionAmount">Valor</label>
+                        <input type="number" id="transactionAmount" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="transactionDescription">Descrição</label>
+                    <input type="text" id="transactionDescription" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="transactionCategory">Categoria</label>
+                        <select id="transactionCategory" required>
+                            <option value="">Selecione a categoria</option>
+                            <!-- Income categories -->
+                            <optgroup label="Receitas" id="incomeCategories" style="display: none;">
+                                <option value="Doações">Doações</option>
+                                <option value="Dízimos">Dízimos</option>
+                                <option value="Ofertas">Ofertas</option>
+                                <option value="Eventos">Eventos</option>
+                                <option value="Outros">Outros</option>
+                            </optgroup>
+                            <!-- Expense categories -->
+                            <optgroup label="Despesas" id="expenseCategories" style="display: none;">
+                                <option value="Utilidades">Utilidades</option>
+                                <option value="Manutenção">Manutenção</option>
+                                <option value="Salários">Salários</option>
+                                <option value="Material">Material</option>
+                                <option value="Eventos">Eventos</option>
+                                <option value="Outros">Outros</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDate">Data</label>
+                        <input type="date" id="transactionDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="transactionMethod">Método de Pagamento</label>
+                    <select id="transactionMethod" required>
+                        <option value="">Selecione o método</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="PIX">PIX</option>
+                        <option value="Transferência">Transferência</option>
+                        <option value="Cartão">Cartão</option>
+                        <option value="Cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transactionNotes">Observações</label>
+                    <textarea id="transactionNotes" rows="2"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeTransactionModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

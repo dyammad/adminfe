@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Sistema da Igreja</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Teste do Sistema da Igreja</h1>
+    <div id="results"></div>
+
+    <script src="sample-data.js"></script>
+    <script src="auth-system.js"></script>
+    <script>
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            document.getElementById('results').appendChild(div);
+        }
+
+        // Teste 1: Verificar se sample-data.js carrega
+        if (typeof generateSampleData === 'function') {
+            addResult('✓ sample-data.js carregado com sucesso', 'success');
+            
+            // Teste 2: Gerar dados
+            try {
+                const data = generateSampleData();
+                addResult(`✓ Dados gerados: ${data.members?.length || 0} membros, ${data.cells?.length || 0} células`, 'success');
+            } catch (e) {
+                addResult(`✗ Erro ao gerar dados: ${e.message}`, 'error');
+            }
+        } else {
+            addResult('✗ sample-data.js não carregado', 'error');
+        }
+
+        // Teste 3: Verificar se auth-system.js carrega
+        if (typeof AuthSystem === 'function') {
+            addResult('✓ auth-system.js carregado com sucesso', 'success');
+            
+            // Teste 4: Instanciar AuthSystem
+            try {
+                const authSystem = new AuthSystem();
+                addResult('✓ AuthSystem instanciado com sucesso', 'success');
+            } catch (e) {
+                addResult(`✗ Erro ao instanciar AuthSystem: ${e.message}`, 'error');
+            }
+        } else {
+            addResult('✗ auth-system.js não carregado', 'error');
+        }
+
+        addResult('Teste concluído. Se todos os itens estão com ✓, o sistema deve funcionar.', 'info');
+    </script>
+</body>
+</html>

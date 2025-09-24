@@ -12,16 +12,30 @@ let donations = [];
 let leaders = [];
 let transactions = [];
 let agenda = [];
+let sampleData = {};
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Inicializando sistema da igreja...');
     initializeApp();
     loadSampleData();
+    
+    // Verificar sessão existente
+    if (window.authSystem && window.authSystem.checkExistingSession()) {
+        window.authSystem.showMainApp();
+        // Aguardar um pouco para garantir que os dados foram carregados
+        setTimeout(() => {
+            updateDashboard();
+        }, 100);
+    }
 });
 
 function initializeApp() {
     // Login form handler
     document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    
+    // Register form handler
+    document.getElementById('registerForm').addEventListener('submit', handleRegister);
     
     // Logout button handler
     document.getElementById('logoutBtn').addEventListener('click', handleLogout);
@@ -52,44 +66,467 @@ function initializeApp() {
 }
 
 // Authentication functions
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
-    // Simple authentication (in a real app, this would be server-side)
-    if (username === 'admin' && password === 'admin') {
-        currentUser = { username: 'admin', name: 'Administrador' };
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'flex';
-        document.getElementById('currentUser').textContent = currentUser.name;
-        updateDashboard();
+    if (!window.authSystem) {
+        alert('Sistema de autenticação não carregado!');
+        return;
+    }
+    
+    const result = await window.authSystem.authenticate(username, password);
+    
+    if (result.success) {
+        currentUser = result.user;
+        window.authSystem.showMainApp();
+        document.getElementById('currentUser').textContent = result.user.name;
+        
+        // Atualizar interface baseada nas permissões
+        updateUIBasedOnPermissions();
+        
+        // Aguardar um pouco para garantir que os dados foram carregados
+        setTimeout(() => {
+            updateDashboard();
+            navigateToSection('dashboard');
+        }, 100);
+        
+        // Resetar formulário
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
     } else {
-        alert('Usuário ou senha incorretos!');
+        window.authSystem.showMessage(result.message, 'error');
     }
 }
 
 function handleLogout() {
-    currentUser = null;
+    if (window.authSystem) {
+        window.authSystem.logout();
+    } else {
+        // Fallback para o sistema antigo
+        currentUser = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+}
+
+// Funções de controle do formulário de cadastro
+function showRegisterForm() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('registerScreen').style.display = 'flex';
+}
+
+function showLoginForm() {
+    document.getElementById('registerScreen').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
+}
+
+// Processar cadastro de visitante
+async function handleRegister(e) {
+    e.preventDefault();
+    
+    if (!window.authSystem) {
+        alert('Sistema de autenticação não carregado!');
+        return;
+    }
+    
+    // Obter dados do formulário
+    const formData = {
+        name: document.getElementById('registerName').value,
+        email: document.getElementById('registerEmail').value,
+        phone: document.getElementById('registerPhone').value,
+        birthdate: document.getElementById('registerBirthdate').value,
+        username: document.getElementById('registerUsername').value,
+        password: document.getElementById('registerPassword').value,
+        howFound: document.getElementById('registerHowFound').value
+    };
+    
+    // Validar confirmação de senha
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+    if (formData.password !== passwordConfirm) {
+        window.authSystem.showMessage('As senhas não coincidem', 'error');
+        return;
+    }
+    
+    // Verificar termos de uso
+    if (!document.getElementById('registerTerms').checked) {
+        window.authSystem.showMessage('Você deve aceitar os termos de uso', 'error');
+        return;
+    }
+    
+    // Tentar fazer o cadastro
+    const result = await window.authSystem.selfRegister(formData);
+    
+    if (result.success) {
+        window.authSystem.showMessage(result.message, 'success');
+        
+        // Limpar formulário
+        document.getElementById('registerForm').reset();
+        
+        // Voltar para tela de login após 3 segundos
+        setTimeout(() => {
+            showLoginForm();
+        }, 3000);
+    } else {
+        window.authSystem.showMessage(result.message, 'error');
+    }
+}
+
+// Atualizar interface baseada nas permissões do usuário
+function updateUIBasedOnPermissions() {
+    if (!window.authSystem || !window.authSystem.currentUser) return;
+    
+    const user = window.authSystem.currentUser;
+    const permissions = user.permissions;
+    
+    // Ocultar/mostrar itens do menu baseado nas permissões
+    const menuItems = [
+        { element: '[data-section="members-active"]', permission: 'members.view' },
+        { element: '[data-section="members-inactive"]', permission: 'members.view' },
+        { element: '[data-section="members-visitors"]', permission: 'members.view' },
+        { element: '[data-section="ministries"]', permission: 'ministries.view' },
+        { element: '[data-section="leaders"]', permission: 'leaders.view' },
+        { element: '[data-section="cells"]', permission: 'cells.view' },
+        { element: '[data-section="events"]', permission: 'events.view' },
+        { element: '[data-section="pastor-agenda"]', permission: 'agenda.view' },
+        { element: '[data-section="treasury"]', permission: 'treasury.view' },
+        { element: '[data-section="prayer-requests"]', permission: 'prayers.view' },
+        { element: '[data-section="baptisms"]', permission: 'baptisms.view' },
+        { element: '[data-section="donations"]', permission: 'donations.view' }
+    ];
+    
+    menuItems.forEach(item => {
+        const element = document.querySelector(item.element);
+        if (element) {
+            const listItem = element.closest('li');
+            if (permissions[item.permission]) {
+                listItem.style.display = 'block';
+            } else {
+                listItem.style.display = 'none';
+            }
+        }
+    });
+    
+    // Ocultar/mostrar botões de ação baseado nas permissões
+    updateActionButtons();
+    
+    // Mostrar informações do usuário
+    updateUserInfo();
+}
+
+// Atualizar botões de ação baseado nas permissões
+function updateActionButtons() {
+    if (!window.authSystem || !window.authSystem.currentUser) return;
+    
+    const permissions = window.authSystem.currentUser.permissions;
+    
+    // Botões de criar/adicionar
+    const createButtons = [
+        { selector: 'button[onclick="openMemberModal()"]', permission: 'members.create' },
+        { selector: 'button[onclick="openVisitorModal()"]', permission: 'members.create' },
+        { selector: 'button[onclick="openMinistryModal()"]', permission: 'ministries.create' },
+        { selector: 'button[onclick="openLeaderModal()"]', permission: 'leaders.create' },
+        { selector: 'button[onclick="openCellModal()"]', permission: 'cells.create' },
+        { selector: 'button[onclick="openEventModal()"]', permission: 'events.create' },
+        { selector: 'button[onclick="openAgendaModal()"]', permission: 'agenda.create' },
+        { selector: 'button[onclick="openPrayerModal()"]', permission: 'prayers.create' },
+        { selector: 'button[onclick="openBaptismModal()"]', permission: 'baptisms.create' },
+        { selector: 'button[onclick="openDonationModal()"]', permission: 'donations.create' }
+    ];
+    
+    createButtons.forEach(button => {
+        const element = document.querySelector(button.selector);
+        if (element) {
+            element.style.display = permissions[button.permission] ? 'inline-flex' : 'none';
+        }
+    });
+}
+
+// Atualizar informações do usuário na interface
+function updateUserInfo() {
+    if (!window.authSystem || !window.authSystem.currentUser) return;
+    
+    const user = window.authSystem.currentUser;
+    const role = window.authSystem.getCurrentUserRole();
+    
+    // Atualizar nome do usuário
+    const userNameElement = document.getElementById('currentUser');
+    if (userNameElement) {
+        userNameElement.textContent = user.name;
+        userNameElement.title = `${user.name} (${role?.name || user.role})`;
+    }
+    
+    // Adicionar indicador de role se não existir
+    let roleIndicator = document.querySelector('.user-role-indicator');
+    if (!roleIndicator && role) {
+        roleIndicator = document.createElement('span');
+        roleIndicator.className = 'user-role-indicator';
+        roleIndicator.style.cssText = `
+            background-color: ${role.color};
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        `;
+        roleIndicator.textContent = role.name;
+        
+        const userInfo = document.querySelector('.user-info');
+        if (userInfo) {
+            userInfo.appendChild(roleIndicator);
+        }
+    }
+}
+
+// Funções de busca para membros
+function searchMembers(type) {
+    const searchInput = document.getElementById(`search${type === 'active' ? 'Active' : type === 'inactive' ? 'Inactive' : 'Visitors'}Members`);
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    let tableId;
+    let dataArray;
+    
+    switch(type) {
+        case 'active':
+            tableId = 'activeMembersTable';
+            dataArray = sampleData.members.filter(m => m.status === 'active');
+            break;
+        case 'inactive':
+            tableId = 'inactiveMembersTable';
+            dataArray = sampleData.members.filter(m => m.status === 'inactive');
+            break;
+        case 'visitors':
+            tableId = 'visitorsTable';
+            dataArray = sampleData.visitors;
+            break;
+    }
+    
+    if (!dataArray) return;
+    
+    // Filtrar dados baseado na busca
+    const filteredData = dataArray.filter(item => {
+        return item.name.toLowerCase().includes(searchTerm) ||
+               item.email.toLowerCase().includes(searchTerm) ||
+               (item.phone && item.phone.toLowerCase().includes(searchTerm));
+    });
+    
+    // Atualizar tabela com dados filtrados
+    updateMemberTable(tableId, filteredData, type);
+}
+
+// Filtrar membros por célula
+function filterMembersByCell(type) {
+    const filterSelect = document.getElementById(`filter${type === 'active' ? 'Active' : 'Inactive'}MembersByCell`);
+    const selectedCell = filterSelect.value;
+    
+    let tableId = type === 'active' ? 'activeMembersTable' : 'inactiveMembersTable';
+    let dataArray = sampleData.members.filter(m => m.status === type);
+    
+    if (selectedCell) {
+        dataArray = dataArray.filter(member => member.cell === selectedCell);
+    }
+    
+    updateMemberTable(tableId, dataArray, type);
+}
+
+// Filtrar membros inativos por motivo
+function filterMembersByReason(type) {
+    const filterSelect = document.getElementById('filterInactiveMembersByReason');
+    const selectedReason = filterSelect.value;
+    
+    let dataArray = sampleData.members.filter(m => m.status === 'inactive');
+    
+    if (selectedReason) {
+        dataArray = dataArray.filter(member => member.inactiveReason === selectedReason);
+    }
+    
+    updateMemberTable('inactiveMembersTable', dataArray, 'inactive');
+}
+
+// Filtrar visitantes por fonte
+function filterVisitorsBySource() {
+    const filterSelect = document.getElementById('filterVisitorsBySource');
+    const selectedSource = filterSelect.value;
+    
+    let dataArray = sampleData.visitors;
+    
+    if (selectedSource) {
+        dataArray = dataArray.filter(visitor => visitor.howFound === selectedSource);
+    }
+    
+    updateMemberTable('visitorsTable', dataArray, 'visitors');
+}
+
+// Atualizar tabela de membros
+function updateMemberTable(tableId, data, type) {
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = '';
+    
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        
+        if (type === 'active') {
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.email}</td>
+                <td>${item.phone}</td>
+                <td>${item.birthDate ? new Date(item.birthDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                <td>${item.cell || 'Não definida'}</td>
+                <td>
+                    <button class="btn-icon" onclick="editMember(${item.id})" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-danger" onclick="deleteMember(${item.id})" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+        } else if (type === 'inactive') {
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.email}</td>
+                <td>${item.phone}</td>
+                <td>${item.inactiveDate ? new Date(item.inactiveDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                <td>${item.inactiveReason || 'Não informado'}</td>
+                <td>
+                    <button class="btn-icon" onclick="reactivateMember(${item.id})" title="Reativar">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                    <button class="btn-icon btn-danger" onclick="deleteMember(${item.id})" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+        } else if (type === 'visitors') {
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.email}</td>
+                <td>${item.phone}</td>
+                <td>${item.visitDate ? new Date(item.visitDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                <td>${getHowFoundText(item.howFound)}</td>
+                <td>
+                    <button class="btn-icon" onclick="convertToMember(${item.id})" title="Converter em Membro">
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                    <button class="btn-icon" onclick="editVisitor(${item.id})" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-danger" onclick="deleteVisitor(${item.id})" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+        }
+        
+        tbody.appendChild(row);
+    });
+}
+
+// Obter texto legível para "como conheceu"
+function getHowFoundText(value) {
+    const options = {
+        'amigo': 'Indicação de amigo',
+        'internet': 'Internet',
+        'redes_sociais': 'Redes sociais',
+        'passando': 'Passando pela rua',
+        'evento': 'Evento da igreja',
+        'outro': 'Outro'
+    };
+    return options[value] || value;
+}
+
+// Verificar e mostrar alerta de cadastros pendentes
+function checkPendingRegistrations() {
+    if (!window.authSystem) {
+        console.log('AuthSystem não encontrado.');
+        return;
+    }
+
+    // Verificar se usuário tem permissão para ver usuários
+    const canViewUsers = window.authSystem.hasPermission('users.view');
+    if (!canViewUsers) {
+        console.log('Usuário atual NÃO TEM permissão para ver usuários pendentes (users.view). O alerta não será exibido.');
+        hidePendingRegistrationsAlert(); // Garante que o alerta seja escondido se não houver permissão
+        return;
+    }
+
+    console.log('Usuário atual TEM permissão para ver usuários pendentes.');
+    const result = window.authSystem.getPendingUsers();
+    console.log('Resultado da busca por usuários pendentes:', result);
+
+    if (result.success && result.users.length > 0) {
+        console.log(`Encontrado(s) ${result.users.length} usuário(s) pendente(s). Exibindo alerta.`);
+        showPendingRegistrationsAlert(result.users.length);
+    } else {
+        console.log('Nenhum usuário pendente encontrado. Ocultando alerta.');
+        hidePendingRegistrationsAlert();
+    }
+}
+
+// Mostrar alerta de cadastros pendentes
+function showPendingRegistrationsAlert(count) {
+    const alertContainer = document.getElementById('pendingRegistrationsAlert');
+    const messageElement = document.getElementById('pendingRegistrationsMessage');
+    
+    if (alertContainer && messageElement) {
+        messageElement.textContent = `${count} ${count === 1 ? 'visitante se cadastrou' : 'visitantes se cadastraram'} e ${count === 1 ? 'aguarda' : 'aguardam'} aprovação.`;
+        alertContainer.style.display = 'block';
+    }
+}
+
+// Ocultar alerta de cadastros pendentes
+function hidePendingRegistrationsAlert() {
+    const alertContainer = document.getElementById('pendingRegistrationsAlert');
+    if (alertContainer) {
+        alertContainer.style.display = 'none';
+    }
+}
+
+// Dispensar alerta temporariamente
+function dismissPendingAlert() {
+    hidePendingRegistrationsAlert();
+    // Salvar no localStorage que foi dispensado (opcional)
+    localStorage.setItem('pendingAlertDismissed', Date.now().toString());
 }
 
 // Navigation functions
 function navigateToSection(sectionId) {
+    // Caso especial para o gerenciamento de usuários, que é dinâmico
+    if (sectionId === 'user-management') {
+        if (window.userManager && typeof window.userManager.showUserManagement === 'function') {
+            window.userManager.showUserManagement();
+        } else {
+            console.error('User Manager não está inicializado.');
+            alert('Erro ao carregar o gerenciamento de usuários.');
+        }
+        return; // A função showUserManagement cuidará da navegação
+    }
+
     // Hide all sections
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(section => section.classList.remove('active'));
     
     // Show selected section
-    document.getElementById(sectionId).classList.add('active');
+    const sectionElement = document.getElementById(sectionId);
+    if (sectionElement) {
+        sectionElement.classList.add('active');
+    } else {
+        console.error(`Seção com ID '${sectionId}' não encontrada.`);
+        return; // Interrompe se a seção não existe
+    }
     
     // Update navigation
     const navLinks = document.querySelectorAll('.sidebar-menu a');
     navLinks.forEach(link => link.classList.remove('active'));
-    document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+    
+    const activeLink = document.querySelector(`[data-section="${sectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
     
     // Update page title
     const titles = {
@@ -157,152 +594,91 @@ function loadSectionData(sectionId) {
     }
 }
 
-// Dashboard functions
 function updateDashboard() {
-    const activeMembers = members.filter(m => m.status === 'active');
-    const inactiveMembers = members.filter(m => m.status === 'inactive');
+    console.log('updateDashboard() chamada');
+    console.log('sampleData:', sampleData);
     
-    document.getElementById('totalMembers').textContent = members.length;
-    document.getElementById('activeMembers').textContent = activeMembers.length;
-    document.getElementById('totalCells').textContent = cells.length;
-    document.getElementById('monthlyOffering').textContent = 'R$ 12.450,00';
+    if (!sampleData.members || !sampleData.cells || !sampleData.donations) {
+        console.warn('Dados ainda não carregados, tentando novamente...');
+        setTimeout(updateDashboard, 200);
+        return;
+    }
     
-    // Initialize charts
-    initializeCharts();
+    console.log('Dados carregados, atualizando dashboard...');
+    
+    // Update member statistics
+    const activeMembers = sampleData.members.filter(m => m.status === 'active').length;
+    const totalMembers = sampleData.members.length;
+    const totalCells = sampleData.cells.length;
+    
+    document.getElementById('activeMembers').textContent = activeMembers;
+    document.getElementById('totalMembers').textContent = totalMembers;
+    document.getElementById('totalCells').textContent = totalCells;
+    
+    // Calculate monthly offering
+    const currentMonth = new Date().getMonth();
+    const monthlyOffering = sampleData.donations
+        .filter(d => new Date(d.date).getMonth() === currentMonth)
+        .reduce((sum, d) => sum + d.amount, 0);
+    
+    document.getElementById('monthlyOffering').textContent = 
+        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(monthlyOffering);
+    
+    // Verificar cadastros pendentes (apenas para admins)
+    checkPendingRegistrations();
+    
+    // Preencher filtros de células
+    populateCellFilters();
+    
+    // Update charts
+    updateCharts();
 }
 
-function initializeCharts() {
-    // Members growth chart
-    const membersCtx = document.getElementById('membersChart').getContext('2d');
-    new Chart(membersCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{
-                label: 'Membros',
-                data: [120, 125, 130, 128, 135, 142],
-                borderColor: '#3498db',
-                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: false
-                }
-            }
-        }
-    });
-
-    // Offerings chart
-    const offeringsCtx = document.getElementById('offeringsChart').getContext('2d');
-    new Chart(offeringsCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-            datasets: [{
-                label: 'Ofertas (R$)',
-                data: [8500, 9200, 11000, 10500, 12000, 12450],
-                backgroundColor: '#2ecc71'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+// Popular filtros de células
+function populateCellFilters() {
+    const activeFilter = document.getElementById('filterActiveMembersByCell');
+    const inactiveFilter = document.getElementById('filterInactiveMembersByCell');
+    
+    if (activeFilter && inactiveFilter && sampleData.cells) {
+        // Limpar opções existentes (exceto a primeira)
+        activeFilter.innerHTML = '<option value="">Todas as células</option>';
+        inactiveFilter.innerHTML = '<option value="">Todas as células</option>';
+        
+        // Adicionar células
+        sampleData.cells.forEach(cell => {
+            const option1 = document.createElement('option');
+            option1.value = cell.name;
+            option1.textContent = cell.name;
+            activeFilter.appendChild(option1);
+            
+            const option2 = document.createElement('option');
+            option2.value = cell.name;
+            option2.textContent = cell.name;
+            inactiveFilter.appendChild(option2);
+        });
+    }
 }
+
 
 // Member management functions
 function loadActiveMembers() {
-    const activeMembers = members.filter(m => m.status === 'active');
-    const tbody = document.querySelector('#activeMembersTable tbody');
-    tbody.innerHTML = '';
+    if (!sampleData.members) return;
     
-    activeMembers.forEach(member => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${member.name}</td>
-            <td>${member.email}</td>
-            <td>${member.phone}</td>
-            <td>${formatDate(member.birthdate)}</td>
-            <td>${member.cell || 'Não definida'}</td>
-            <td>
-                <button class="btn btn-secondary" onclick="editMember(${member.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-danger" onclick="deactivateMember(${member.id})">
-                    <i class="fas fa-user-slash"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+    const activeMembers = sampleData.members.filter(m => m.status === 'active');
+    updateMemberTable('activeMembersTable', activeMembers, 'active');
 }
 
 function loadInactiveMembers() {
-    const inactiveMembers = members.filter(m => m.status === 'inactive');
-    const tbody = document.querySelector('#inactiveMembersTable tbody');
-    tbody.innerHTML = '';
+    if (!sampleData.members) return;
     
-    inactiveMembers.forEach(member => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${member.name}</td>
-            <td>${member.email}</td>
-            <td>${member.phone}</td>
-            <td>${formatDate(member.inactivatedAt)}</td>
-            <td>${member.inactivationReason || 'Não informado'}</td>
-            <td>
-                <button class="btn btn-success" onclick="reactivateMember(${member.id})">
-                    <i class="fas fa-user-check"></i> Reativar
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+    const inactiveMembers = sampleData.members.filter(m => m.status === 'inactive');
+    updateMemberTable('inactiveMembersTable', inactiveMembers, 'inactive');
 }
 
 function loadVisitors() {
-    const visitors = members.filter(m => m.status === 'visitor');
-    const tbody = document.querySelector('#visitorsTable tbody');
-    tbody.innerHTML = '';
+    if (!sampleData.visitors) return;
     
-    visitors.forEach(visitor => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${visitor.name}</td>
-            <td>${visitor.email}</td>
-            <td>${visitor.phone}</td>
-            <td>${formatDate(visitor.visitDate)}</td>
-            <td>${visitor.howKnew || 'Não informado'}</td>
-            <td>
-                <button class="btn btn-success" onclick="convertToMember(${visitor.id})">
-                    <i class="fas fa-user-plus"></i> Converter
-                </button>
-                <button class="btn btn-secondary" onclick="editMember(${visitor.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+    updateMemberTable('visitorsTable', sampleData.visitors, 'visitors');
 }
 
 // Ministry management
@@ -1398,21 +1774,21 @@ function deleteTransaction(id) { alert('Função de exclusão em desenvolvimento
 function loadSampleData() {
     // Check if generateSampleData function is available
     if (typeof generateSampleData === 'function') {
-        const sampleData = generateSampleData();
+        sampleData = generateSampleData();
         
         // Load all the generated data
-        members = sampleData.members;
-        ministries = sampleData.ministries;
-        cells = sampleData.cells;
-        leaders = sampleData.leaders;
-        events = sampleData.events;
-        prayerRequests = sampleData.prayerRequests;
-        baptisms = sampleData.baptisms;
-        donations = sampleData.donations;
-        transactions = sampleData.transactions;
-        agenda = sampleData.agenda;
+        members = sampleData.members || [];
+        ministries = sampleData.ministries || [];
+        cells = sampleData.cells || [];
+        leaders = sampleData.leaders || [];
+        events = sampleData.events || [];
+        prayerRequests = sampleData.prayerRequests || [];
+        baptisms = sampleData.baptisms || [];
+        donations = sampleData.donations || [];
+        transactions = sampleData.transactions || [];
+        agenda = sampleData.agenda || [];
         
-        console.log(`Dados carregados: ${members.length} membros, ${ministries.length} ministérios`);
+        console.log(`Dados carregados: ${members.length} membros, ${ministries.length} ministérios, ${cells.length} células`);
     } else {
         // Fallback to basic sample data if generateSampleData is not available
         console.warn('Função generateSampleData não encontrada, carregando dados básicos');
@@ -1493,4 +1869,96 @@ window.onclick = function(event) {
             closeFunc();
         }
     });
+}
+
+// Global variables to store chart instances
+let membersChart = null;
+let offeringsChart = null;
+
+// Function to update/create charts
+function updateCharts() {
+    console.log('updateCharts() chamada - iniciando criação dos gráficos...');
+    
+    // Destroy existing charts if they exist
+    if (membersChart) {
+        membersChart.destroy();
+        console.log('Gráfico de membros anterior destruído');
+    }
+    if (offeringsChart) {
+        offeringsChart.destroy();
+        console.log('Gráfico de ofertas anterior destruído');
+    }
+    
+    // Create new charts
+    initializeCharts();
+    console.log('Gráficos inicializados');
+}
+
+// Modified initializeCharts function to store chart instances
+function initializeCharts() {
+    console.log('initializeCharts() chamada');
+    
+    // Members growth chart
+    const membersCtx = document.getElementById('membersChart');
+    console.log('Elemento membersChart encontrado:', membersCtx);
+    if (membersCtx) {
+        console.log('Criando gráfico de membros...');
+        membersChart = new Chart(membersCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Membros',
+                    data: [120, 125, 130, 128, 135, 142],
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                }
+            }
+        });
+    }
+
+    // Offerings chart
+    const offeringsCtx = document.getElementById('offeringsChart');
+    console.log('Elemento offeringsChart encontrado:', offeringsCtx);
+    if (offeringsCtx) {
+        console.log('Criando gráfico de ofertas...');
+        offeringsChart = new Chart(offeringsCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Ofertas (R$)',
+                    data: [8500, 9200, 11000, 10500, 12000, 12450],
+                    backgroundColor: '#2ecc71'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 }

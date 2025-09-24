@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestão da Igreja</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="auth-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="sample-data.js"></script>
+    <script src="auth-system.js"></script>
+    <script src="user-management.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
     <!-- Login Screen -->
@@ -27,6 +31,86 @@
                     <input type="password" id="password" required>
                 </div>
                 <button type="submit" class="login-btn">Entrar</button>
+            </form>
+            <div class="login-footer">
+                <p>Primeira vez aqui?</p>
+                <button type="button" class="register-link" onclick="showRegisterForm()">
+                    <i class="fas fa-user-plus"></i> Cadastre-se como Visitante
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="registerScreen" class="login-container" style="display: none;">
+        <div class="login-box register-box">
+            <div class="login-header">
+                <i class="fas fa-church"></i>
+                <h2>Cadastro de Visitante</h2>
+                <p>Registre-se para acompanhar as atividades da igreja</p>
+            </div>
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registerName">Nome Completo *</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email *</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registerPhone">Telefone</label>
+                        <input type="tel" id="registerPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerBirthdate">Data de Nascimento</label>
+                        <input type="date" id="registerBirthdate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="registerUsername">Nome de Usuário *</label>
+                    <input type="text" id="registerUsername" required>
+                    <small>Será usado para fazer login no sistema</small>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registerPassword">Senha *</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">Confirmar Senha *</label>
+                        <input type="password" id="registerPasswordConfirm" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="registerHowFound">Como conheceu nossa igreja?</label>
+                    <select id="registerHowFound">
+                        <option value="">Selecione uma opção</option>
+                        <option value="amigo">Indicação de amigo/familiar</option>
+                        <option value="internet">Pesquisa na internet</option>
+                        <option value="redes_sociais">Redes sociais</option>
+                        <option value="passando">Passando pela rua</option>
+                        <option value="evento">Evento da igreja</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="registerTerms" required>
+                        Aceito os termos de uso e política de privacidade
+                    </label>
+                </div>
+                <div class="register-buttons">
+                    <button type="button" class="btn-secondary" onclick="showLoginForm()">
+                        <i class="fas fa-arrow-left"></i> Voltar ao Login
+                    </button>
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-user-plus"></i> Cadastrar
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -107,6 +191,25 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Alerta de Cadastros Pendentes -->
+                    <div id="pendingRegistrationsAlert" class="alert-container" style="display: none;">
+                        <div class="alert alert-warning">
+                            <div class="alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="alert-content">
+                                <h4>Novos Cadastros Aguardando Aprovação</h4>
+                                <p id="pendingRegistrationsMessage">Existem visitantes que se cadastraram e aguardam aprovação.</p>
+                                <button class="btn btn-warning" onclick="navigateToSection('user-management')">
+                                    <i class="fas fa-users-cog"></i> Gerenciar Usuários
+                                </button>
+                            </div>
+                            <button class="alert-close" onclick="dismissPendingAlert()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
                     
                     <div class="charts-grid">
                         <div class="chart-container">
@@ -128,6 +231,17 @@
                             <i class="fas fa-plus"></i> Adicionar Membro
                         </button>
                     </div>
+                    <div class="search-filters">
+                        <div class="search-group">
+                            <input type="text" id="searchActiveMembers" placeholder="Buscar por nome, email ou telefone..." onkeyup="searchMembers('active')">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <div class="filter-group">
+                            <select id="filterActiveMembersByCell" onchange="filterMembersByCell('active')">
+                                <option value="">Todas as células</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="table-container">
                         <table id="activeMembersTable" class="data-table">
                             <thead>
@@ -148,6 +262,22 @@
                 <section id="members-inactive" class="content-section">
                     <div class="section-header">
                         <h2>Membros Inativos</h2>
+                    </div>
+                    <div class="search-filters">
+                        <div class="search-group">
+                            <input type="text" id="searchInactiveMembers" placeholder="Buscar por nome, email ou telefone..." onkeyup="searchMembers('inactive')">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <div class="filter-group">
+                            <select id="filterInactiveMembersByReason" onchange="filterMembersByReason('inactive')">
+                                <option value="">Todos os motivos</option>
+                                <option value="mudança">Mudança</option>
+                                <option value="transferência">Transferência</option>
+                                <option value="disciplina">Disciplina</option>
+                                <option value="falecimento">Falecimento</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table id="inactiveMembersTable" class="data-table">
@@ -172,6 +302,23 @@
                         <button class="btn btn-primary" onclick="openVisitorModal()">
                             <i class="fas fa-plus"></i> Adicionar Visitante
                         </button>
+                    </div>
+                    <div class="search-filters">
+                        <div class="search-group">
+                            <input type="text" id="searchVisitors" placeholder="Buscar por nome, email ou telefone..." onkeyup="searchMembers('visitors')">
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <div class="filter-group">
+                            <select id="filterVisitorsBySource" onchange="filterVisitorsBySource()">
+                                <option value="">Como conheceu</option>
+                                <option value="amigo">Indicação de amigo</option>
+                                <option value="internet">Internet</option>
+                                <option value="redes_sociais">Redes sociais</option>
+                                <option value="passando">Passando pela rua</option>
+                                <option value="evento">Evento da igreja</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table id="visitorsTable" class="data-table">

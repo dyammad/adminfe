@@ -868,6 +868,7 @@ textarea:focus {
     .register-box {
         width: 95%;
         margin: 20px auto;
+        padding: 30px 20px;
     }
     
     .form-row {
@@ -882,6 +883,38 @@ textarea:focus {
     
     .register-buttons button {
         width: 100%;
+    }
+    
+    .login-box {
+        width: 95%;
+        margin: 20px auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-box {
+        width: 98%;
+        margin: 10px auto;
+        padding: 25px 15px;
+    }
+    
+    .login-box {
+        width: 98%;
+        margin: 10px auto;
+        padding: 25px 15px;
+    }
+    
+    .login-header h2 {
+        font-size: 18px;
+    }
+    
+    .login-header i {
+        font-size: 36px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        font-size: 14px;
     }
 }
 

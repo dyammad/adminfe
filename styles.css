@@ -493,10 +493,110 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1100;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+    background: #34495e;
+    transform: scale(1.05);
+}
+
+.mobile-menu-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Overlay para mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
     .sidebar {
+        width: 240px;
+    }
+
+    .main-content {
+        margin-left: 240px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ministries-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .agenda-container {
+        grid-template-columns: 1fr;
+    }
+
+    .top-header {
+        padding: 15px 20px;
+    }
+
+    .content-area {
+        padding: 20px;
+    }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 280px;
         transform: translateX(-100%);
-        transition: transform 0.3s;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar.open {
@@ -505,18 +605,330 @@ body {
 
     .main-content {
         margin-left: 0;
+        width: 100%;
+    }
+
+    .top-header {
+        padding: 15px 20px 15px 70px;
+        flex-wrap: wrap;
+    }
+
+    .top-header h1 {
+        font-size: 20px;
+    }
+
+    .user-info {
+        font-size: 14px;
+    }
+
+    .content-area {
+        padding: 15px;
     }
 
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 20px;
     }
 
     .charts-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .chart-container {
+        padding: 20px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .section-header .btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .form-row {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .ministries-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .leaders-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .prayer-requests-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .treasury-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .donations-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .baptism-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .agenda-container {
+        grid-template-columns: 1fr;
+    }
+
+    /* Tabelas responsivas */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table {
+        min-width: 600px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Modal responsivo */
+    .modal-content {
+        width: 95%;
+        margin: 10px auto;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+    }
+
+    .modal form {
+        padding: 20px;
+    }
+
+    /* Login responsivo */
+    .login-box {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+
+    .login-header i {
+        font-size: 40px;
+    }
+
+    .login-header h2 {
+        font-size: 20px;
+    }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    .mobile-menu-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        top: 15px;
+        left: 15px;
+    }
+
+    .top-header {
+        padding: 12px 15px 12px 60px;
+    }
+
+    .top-header h1 {
+        font-size: 18px;
+    }
+
+    .user-info {
+        font-size: 12px;
+    }
+
+    .user-info i {
+        font-size: 20px;
+    }
+
+    .content-area {
+        padding: 10px;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .stat-info h3 {
+        font-size: 24px;
+    }
+
+    .stat-info p {
+        font-size: 12px;
+    }
+
+    .chart-container {
+        padding: 15px;
+    }
+
+    .chart-container h3 {
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .data-table {
+        font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 8px 5px;
+    }
+
+    .btn-icon {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 5px auto;
+    }
+
+    .modal-header h3 {
+        font-size: 18px;
+    }
+
+    .login-box {
+        padding: 25px 15px;
+        margin: 15px;
+    }
+
+    .login-header i {
+        font-size: 36px;
+    }
+
+    .login-header h2 {
+        font-size: 18px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .sidebar {
+        width: 260px;
+    }
+
+    .sidebar-header {
+        padding: 15px;
+    }
+
+    .sidebar-header i {
+        font-size: 28px;
+    }
+
+    .sidebar-menu a {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .ministry-card,
+    .leader-card,
+    .event-card,
+    .prayer-card {
+        padding: 15px;
+    }
+
+    .summary-card {
+        padding: 15px;
+    }
+
+    .summary-card span {
+        font-size: 20px;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .sidebar {
+        width: 240px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .top-header {
+        padding: 10px 15px 10px 60px;
+    }
+
+    .content-area {
+        padding: 15px;
+    }
+}
+
+/* Large Desktop (min-width: 1440px) */
+@media (min-width: 1440px) {
+    .sidebar {
+        width: 300px;
+    }
+
+    .main-content {
+        margin-left: 300px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .charts-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .content-area {
+        padding: 40px;
+    }
+
+    .ministries-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .events-grid {
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    }
+
+    .prayer-requests-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     }
 }
 
@@ -889,4 +1301,104 @@ body {
 .transaction-expense {
     color: #e74c3c;
     font-weight: 600;
+}
+
+/* Melhorias de acessibilidade e touch */
+@media (hover: none) and (pointer: coarse) {
+    /* Dispositivos touch */
+    .btn,
+    .btn-icon,
+    .sidebar-menu a,
+    .filter-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Melhorias para impressão */
+@media print {
+    .sidebar,
+    .mobile-menu-toggle,
+    .sidebar-overlay,
+    .top-header,
+    .btn,
+    .btn-icon,
+    .section-header button {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    .content-area {
+        padding: 0 !important;
+    }
+    
+    .stat-card,
+    .chart-container,
+    .table-container {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+/* Animações suaves para transições */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sidebar,
+.modal,
+.stat-card,
+.chart-container,
+.ministry-card,
+.leader-card,
+.event-card {
+    transition: all 0.3s ease;
+}
+
+/* Melhorias de contraste para acessibilidade */
+@media (prefers-contrast: high) {
+    .btn,
+    .stat-card,
+    .chart-container {
+        border: 2px solid #000;
+    }
+}
+
+/* Modo escuro (preparação futura) */
+@media (prefers-color-scheme: dark) {
+    /* Pode ser implementado futuramente */
+}
+
+/* Otimizações de performance */
+.sidebar,
+.modal-content {
+    will-change: transform;
+}
+
+/* Prevenção de zoom em inputs no iOS */
+@media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
 }

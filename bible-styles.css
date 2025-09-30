@@ -1,0 +1,852 @@
+/* Bible Module Styles */
+
+.bible-container {
+    background: #f8f9fa;
+    min-height: calc(100vh - 200px);
+}
+
+/* Bible Header */
+.bible-header {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.bible-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.bible-title i {
+    font-size: 32px;
+    color: #8b4513;
+}
+
+.bible-title h2 {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 400;
+}
+
+/* Language Toggle */
+.bible-language-toggle {
+    display: flex;
+    gap: 10px;
+}
+
+.lang-btn {
+    padding: 10px 20px;
+    border: 2px solid #e1e1e1;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.lang-btn:hover {
+    border-color: #8b4513;
+    background: #f8f9fa;
+}
+
+.lang-btn.active {
+    background: #8b4513;
+    color: white;
+    border-color: #8b4513;
+}
+
+/* Bible Navigation */
+.bible-navigation {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.bible-search {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.bible-search input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.bible-search input:focus {
+    outline: none;
+    border-color: #8b4513;
+}
+
+.bible-selectors {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.bible-selectors select {
+    padding: 12px 15px;
+    border: 2px solid #e1e1e1;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.bible-selectors select:focus {
+    outline: none;
+    border-color: #8b4513;
+}
+
+/* Bible Content Wrapper */
+.bible-content-wrapper {
+    display: grid;
+    grid-template-columns: 250px 1fr 300px;
+    gap: 20px;
+}
+
+/* Books Sidebar */
+.bible-books-sidebar {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    max-height: calc(100vh - 350px);
+    overflow-y: auto;
+}
+
+.bible-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.bible-sidebar-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #2c3e50;
+}
+
+.bible-quick-access {
+    margin-bottom: 25px;
+}
+
+.bible-quick-access h4 {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quick-links button {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+    font-size: 13px;
+}
+
+.quick-links button:hover {
+    background: #8b4513;
+    color: white;
+    border-color: #8b4513;
+}
+
+.testament-section {
+    margin-bottom: 25px;
+}
+
+.testament-section h4 {
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.book-btn {
+    padding: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.book-btn:hover {
+    background: #8b4513;
+    color: white;
+    border-color: #8b4513;
+    transform: translateY(-2px);
+}
+
+/* Reading Area */
+.bible-reading-area {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    min-height: 600px;
+}
+
+.bible-reading-header {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.bible-passage-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bible-passage-info h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 24px;
+}
+
+.bible-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Verses Container */
+.bible-verses-container {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #2c3e50;
+}
+
+.verses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.verse-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.verse-item:hover {
+    background: #f8f9fa;
+}
+
+.verse-item.selected {
+    background: #fff3cd;
+    border-left: 4px solid #8b4513;
+}
+
+.verse-number {
+    font-weight: 700;
+    color: #8b4513;
+    min-width: 30px;
+    font-size: 14px;
+}
+
+.verse-text {
+    flex: 1;
+}
+
+.verse-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.verse-item:hover .verse-actions {
+    opacity: 1;
+}
+
+.favorite-icon {
+    color: #e74c3c;
+}
+
+.note-icon {
+    color: #f39c12;
+}
+
+/* Welcome Screen */
+.bible-welcome {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.bible-welcome i {
+    font-size: 64px;
+    color: #8b4513;
+    margin-bottom: 20px;
+}
+
+.bible-welcome h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.bible-welcome p {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+.bible-daily-verse {
+    background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin: 30px 0;
+    box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+}
+
+.bible-daily-verse h4 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.daily-verse-content .verse-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.daily-verse-content .verse-reference {
+    font-weight: 600;
+    text-align: right;
+    margin: 0;
+}
+
+.bible-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.bible-stats .stat-item {
+    text-align: center;
+}
+
+.bible-stats .stat-item i {
+    font-size: 32px;
+    color: #8b4513;
+    margin-bottom: 10px;
+}
+
+.bible-stats .number {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.bible-stats .label {
+    display: block;
+    font-size: 14px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+}
+
+/* Navigation Buttons */
+.bible-navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+}
+
+/* Notes Sidebar */
+.bible-notes-sidebar {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    max-height: calc(100vh - 350px);
+    overflow-y: auto;
+}
+
+.bible-tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 20px;
+}
+
+.bible-tabs .tab-btn {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 13px;
+    color: #7f8c8d;
+}
+
+.bible-tabs .tab-btn:hover {
+    color: #2c3e50;
+}
+
+.bible-tabs .tab-btn.active {
+    color: #8b4513;
+    border-bottom-color: #8b4513;
+}
+
+.bible-tab-content {
+    min-height: 300px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.empty-state small {
+    font-size: 13px;
+}
+
+/* Favorites List */
+.favorites-list,
+.notes-list,
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.favorite-item,
+.note-item,
+.history-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #8b4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.favorite-item:hover,
+.note-item:hover,
+.history-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.favorite-header,
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.favorite-text,
+.note-text {
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.favorite-item small,
+.note-item small,
+.history-item small {
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .bible-content-wrapper {
+        grid-template-columns: 200px 1fr 250px;
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .bible-content-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .bible-books-sidebar,
+    .bible-notes-sidebar {
+        max-height: none;
+    }
+
+    .bible-selectors {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .bible-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+
+    .bible-title {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .bible-language-toggle {
+        width: 100%;
+    }
+
+    .lang-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .bible-navigation {
+        padding: 15px;
+    }
+
+    .bible-search {
+        flex-direction: column;
+    }
+
+    .bible-reading-area {
+        padding: 20px 15px;
+    }
+
+    .bible-passage-info {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .bible-actions {
+        flex-wrap: wrap;
+    }
+
+    .bible-navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .bible-navigation-buttons .btn {
+        width: 100%;
+    }
+
+    .bible-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .bible-title h2 {
+        font-size: 20px;
+    }
+
+    .bible-passage-info h3 {
+        font-size: 20px;
+    }
+
+    .bible-daily-verse {
+        padding: 20px 15px;
+    }
+
+    .daily-verse-content .verse-text {
+        font-size: 16px;
+    }
+
+    .verse-item {
+        padding: 10px;
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .bible-header,
+    .bible-navigation,
+    .bible-books-sidebar,
+    .bible-notes-sidebar,
+    .bible-actions,
+    .bible-navigation-buttons {
+        display: none !important;
+    }
+
+    .bible-content-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .bible-reading-area {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .verse-item {
+        page-break-inside: avoid;
+    }
+}
+
+/* Scrollbar Styling */
+.bible-books-sidebar::-webkit-scrollbar,
+.bible-notes-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.bible-books-sidebar::-webkit-scrollbar-track,
+.bible-notes-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.bible-books-sidebar::-webkit-scrollbar-thumb,
+.bible-notes-sidebar::-webkit-scrollbar-thumb {
+    background: #8b4513;
+    border-radius: 10px;
+}
+
+.bible-books-sidebar::-webkit-scrollbar-thumb:hover,
+.bible-notes-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #6d3710;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verse-item {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.verse-item:nth-child(even) {
+    animation-delay: 0.05s;
+}
+
+/* Collapsed Sidebar */
+.bible-books-sidebar.collapsed {
+    width: 60px;
+    padding: 10px;
+}
+
+.bible-books-sidebar.collapsed .bible-sidebar-header h3,
+.bible-books-sidebar.collapsed .bible-quick-access,
+.bible-books-sidebar.collapsed .testament-section h4 {
+    display: none;
+}
+
+.bible-books-sidebar.collapsed .books-grid {
+    grid-template-columns: 1fr;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #8b4513;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+/* Search Results */
+.search-results {
+    padding: 20px 0;
+}
+
+.search-results h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.search-result-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #8b4513;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-result-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-reference {
+    font-weight: 600;
+    color: #8b4513;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.result-text {
+    color: #2c3e50;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+/* API Status Indicator */
+.api-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+.api-status.online {
+    border-left: 4px solid #27ae60;
+}
+
+.api-status.offline {
+    border-left: 4px solid #e74c3c;
+}
+
+.api-status i {
+    font-size: 14px;
+}
+
+.api-status.online i {
+    color: #27ae60;
+}
+
+.api-status.offline i {
+    color: #e74c3c;
+}
+
+/* Cache Info */
+.cache-info {
+    background: #e3f2fd;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #1976d2;
+}
+
+.cache-info i {
+    font-size: 16px;
+}

@@ -1,0 +1,790 @@
+/* Devotional Module Styles */
+
+.devotional-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Missions Section */
+.missions-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.missions-section h3 {
+    color: #2c3e50;
+    font-size: 24px;
+    margin: 0 0 25px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.missions-section h3 i {
+    color: #f39c12;
+    font-size: 28px;
+}
+
+.missions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.mission-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    border: 2px solid #e1e1e1;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.mission-card.completed {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border-color: #28a745;
+}
+
+.mission-card.completed::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.mission-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mission-icon i {
+    font-size: 28px;
+    color: white;
+}
+
+.mission-content {
+    flex: 1;
+}
+
+.mission-content h4 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.mission-content p {
+    margin: 0 0 10px 0;
+    color: #6c757d;
+    font-size: 13px;
+}
+
+.mission-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.progress-bar-mini {
+    height: 8px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill-mini {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.5s ease;
+}
+
+.mission-card.completed .progress-fill-mini {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.progress-text {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.mission-badge {
+    width: 50px;
+    height: 50px;
+    background: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mission-badge i {
+    font-size: 24px;
+    color: #adb5bd;
+}
+
+.mission-badge.unlocked {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    animation: pulse 1s ease-in-out;
+}
+
+.mission-badge.unlocked i {
+    color: white;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Devotional Header */
+.devotional-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.devotional-title {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.devotional-title i {
+    font-size: 48px;
+}
+
+.devotional-title h2 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.devotional-title p {
+    margin: 5px 0 0 0;
+    opacity: 0.9;
+    font-size: 16px;
+}
+
+.devotional-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12px 20px;
+    border-radius: 10px;
+}
+
+.devotional-date i {
+    font-size: 24px;
+}
+
+/* Today's Devotional */
+.today-devotional {
+    margin-bottom: 40px;
+}
+
+.devotional-card {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.main-devotional {
+    border-top: 5px solid #667eea;
+}
+
+.devotional-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.devotional-badge i {
+    font-size: 16px;
+}
+
+.devotional-theme {
+    color: #2c3e50;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 25px 0;
+    line-height: 1.3;
+}
+
+.devotional-verse {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 30px;
+    border-radius: 12px;
+    border-left: 5px solid #667eea;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.devotional-verse i {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    color: #667eea;
+    opacity: 0.3;
+}
+
+.devotional-verse p {
+    font-size: 20px;
+    line-height: 1.8;
+    color: #2c3e50;
+    margin: 0 0 15px 0;
+    padding-left: 40px;
+    font-style: italic;
+}
+
+.verse-reference {
+    display: block;
+    text-align: right;
+    font-weight: 600;
+    color: #667eea;
+    font-size: 16px;
+}
+
+.devotional-reflection,
+.devotional-prayer {
+    margin-bottom: 30px;
+}
+
+.devotional-reflection h4,
+.devotional-prayer h4 {
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.devotional-reflection h4 i {
+    color: #f39c12;
+}
+
+.devotional-prayer h4 i {
+    color: #667eea;
+}
+
+.devotional-reflection p,
+.devotional-prayer p {
+    color: #555;
+    line-height: 1.8;
+    font-size: 16px;
+    text-align: justify;
+}
+
+.devotional-actions {
+    display: flex;
+    gap: 15px;
+    padding-top: 25px;
+    border-top: 2px solid #f0f0f0;
+    flex-wrap: wrap;
+}
+
+/* Devotional Sections */
+.devotional-sections {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.devotional-calendar-section,
+.saved-devotionals-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.devotional-calendar-section h3,
+.saved-devotionals-section h3 {
+    color: #2c3e50;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.calendar-day {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-align: center;
+}
+
+.calendar-day:hover {
+    background: #e9ecef;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.day-number {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.day-name {
+    font-size: 12px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 8px;
+}
+
+.day-theme {
+    font-size: 11px;
+    line-height: 1.3;
+    opacity: 0.9;
+}
+
+/* Saved Devotionals */
+.saved-devotionals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.saved-devotional-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #667eea;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.saved-devotional-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.saved-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.saved-header strong {
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.saved-reference {
+    color: #667eea;
+    font-size: 13px;
+    margin: 5px 0;
+    font-weight: 600;
+}
+
+.saved-devotional-item small {
+    color: #95a5a6;
+    font-size: 12px;
+}
+
+/* Language Selection */
+.devotional-language-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px;
+}
+
+.devotional-language-section h3 {
+    color: #2c3e50;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.language-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 3px solid #e1e1e1;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.language-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.language-option.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+}
+
+.language-option i {
+    font-size: 36px;
+}
+
+.language-option div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.language-option strong {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.language-option span {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* Reading Plan */
+.reading-plan-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.reading-plan-section h3 {
+    color: #2c3e50;
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reading-plan-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 25px;
+    border-radius: 12px;
+    border-left: 5px solid #27ae60;
+}
+
+.plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.plan-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 18px;
+}
+
+.plan-progress {
+    background: #27ae60;
+    color: white;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+    transition: width 0.3s ease;
+}
+
+.plan-today {
+    margin-bottom: 20px;
+}
+
+.plan-today p {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+
+.plan-today ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-today li {
+    padding: 8px 0;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.plan-today li:before {
+    content: "✓";
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.empty-state small {
+    font-size: 13px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .devotional-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .devotional-header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .devotional-title {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .devotional-title h2 {
+        font-size: 24px;
+    }
+
+    .devotional-date {
+        font-size: 14px;
+    }
+
+    .devotional-card {
+        padding: 25px 20px;
+    }
+
+    .devotional-theme {
+        font-size: 22px;
+    }
+
+    .devotional-verse p {
+        font-size: 18px;
+        padding-left: 0;
+    }
+
+    .devotional-verse i {
+        display: none;
+    }
+
+    .devotional-actions {
+        flex-direction: column;
+    }
+
+    .devotional-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .calendar-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .devotional-title h2 {
+        font-size: 20px;
+    }
+
+    .devotional-theme {
+        font-size: 20px;
+    }
+
+    .devotional-verse p {
+        font-size: 16px;
+    }
+
+    .devotional-reflection p,
+    .devotional-prayer p {
+        font-size: 15px;
+    }
+
+    .calendar-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .day-number {
+        font-size: 20px;
+    }
+
+    .day-theme {
+        display: none;
+    }
+
+    .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .category-btn {
+        padding: 15px;
+    }
+
+    .category-btn i {
+        font-size: 24px;
+    }
+
+    .category-btn span {
+        font-size: 12px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .devotional-header,
+    .devotional-actions,
+    .devotional-sections,
+    .devotional-categories,
+    .reading-plan-section {
+        display: none !important;
+    }
+
+    .devotional-card {
+        box-shadow: none;
+        padding: 20px 0;
+    }
+
+    .devotional-verse {
+        page-break-inside: avoid;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.devotional-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.calendar-day {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.calendar-day:nth-child(1) { animation-delay: 0.05s; }
+.calendar-day:nth-child(2) { animation-delay: 0.1s; }
+.calendar-day:nth-child(3) { animation-delay: 0.15s; }
+.calendar-day:nth-child(4) { animation-delay: 0.2s; }
+.calendar-day:nth-child(5) { animation-delay: 0.25s; }
+.calendar-day:nth-child(6) { animation-delay: 0.3s; }
+.calendar-day:nth-child(7) { animation-delay: 0.35s; }

@@ -6,11 +6,18 @@
     <title>Sistema de Gestão da Igreja</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="auth-styles.css">
+    <link rel="stylesheet" href="bible-styles.css">
+    <link rel="stylesheet" href="devotional-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="sample-data.js"></script>
     <script src="auth-system.js"></script>
     <script src="user-management.js"></script>
+    <script src="bible-data.js"></script>
+    <script src="bible-api-service.js"></script>
+    <script src="bible.js"></script>
+    <script src="devotional-data.js"></script>
+    <script src="devotional.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
@@ -142,6 +149,7 @@
                     </ul>
                 </li>
                 <li><a href="#" data-section="ministries"><i class="fas fa-hands-praying"></i> Ministérios</a></li>
+                <li><a href="#" data-section="devotional"><i class="fas fa-book-open"></i> Devocional</a></li>
                 <li><a href="#" data-section="leaders"><i class="fas fa-crown"></i> Líderes</a></li>
                 <li><a href="#" data-section="cells"><i class="fas fa-home"></i> Células</a></li>
                 <li><a href="#" data-section="events"><i class="fas fa-calendar"></i> Eventos</a></li>
@@ -150,6 +158,7 @@
                 <li><a href="#" data-section="prayer-requests"><i class="fas fa-praying-hands"></i> Pedidos de Oração</a></li>
                 <li><a href="#" data-section="baptisms"><i class="fas fa-water"></i> Batismos</a></li>
                 <li><a href="#" data-section="donations"><i class="fas fa-heart"></i> Doações</a></li>
+                <li><a href="#" data-section="bible"><i class="fas fa-book-bible"></i> Bíblia Sagrada</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
@@ -354,6 +363,236 @@
                         </button>
                     </div>
                     <div class="ministries-grid" id="ministriesGrid"></div>
+                </section>
+
+                <!-- Devotional Section -->
+                <section id="devotional" class="content-section">
+                    <div class="devotional-container">
+                        <!-- Missions/Challenges Section -->
+                        <div class="missions-section">
+                            <h3><i class="fas fa-trophy"></i> Missões e Desafios</h3>
+                            <div class="missions-grid">
+                                <div class="mission-card" id="mission365">
+                                    <div class="mission-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="mission-content">
+                                        <h4>Devocional 365 Dias</h4>
+                                        <p>Leia o devocional todos os dias por 1 ano</p>
+                                        <div class="mission-progress">
+                                            <div class="progress-bar-mini">
+                                                <div class="progress-fill-mini" id="progress365" style="width: 0%"></div>
+                                            </div>
+                                            <span class="progress-text" id="progressText365">0/365 dias</span>
+                                        </div>
+                                    </div>
+                                    <div class="mission-badge" id="badge365">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" id="mission30">
+                                    <div class="mission-icon">
+                                        <i class="fas fa-fire"></i>
+                                    </div>
+                                    <div class="mission-content">
+                                        <h4>Sequência de 30 Dias</h4>
+                                        <p>Leia por 30 dias consecutivos</p>
+                                        <div class="mission-progress">
+                                            <div class="progress-bar-mini">
+                                                <div class="progress-fill-mini" id="progress30" style="width: 0%"></div>
+                                            </div>
+                                            <span class="progress-text" id="progressText30">0/30 dias</span>
+                                        </div>
+                                    </div>
+                                    <div class="mission-badge" id="badge30">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" id="mission7">
+                                    <div class="mission-icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="mission-content">
+                                        <h4>Semana Devocional</h4>
+                                        <p>Leia por 7 dias seguidos</p>
+                                        <div class="mission-progress">
+                                            <div class="progress-bar-mini">
+                                                <div class="progress-fill-mini" id="progress7" style="width: 0%"></div>
+                                            </div>
+                                            <span class="progress-text" id="progressText7">0/7 dias</span>
+                                        </div>
+                                    </div>
+                                    <div class="mission-badge" id="badge7">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" id="missionShare">
+                                    <div class="mission-icon">
+                                        <i class="fas fa-share-alt"></i>
+                                    </div>
+                                    <div class="mission-content">
+                                        <h4>Compartilhador</h4>
+                                        <p>Compartilhe 10 devocionais</p>
+                                        <div class="mission-progress">
+                                            <div class="progress-bar-mini">
+                                                <div class="progress-fill-mini" id="progressShare" style="width: 0%"></div>
+                                            </div>
+                                            <span class="progress-text" id="progressTextShare">0/10 compartilhamentos</span>
+                                        </div>
+                                    </div>
+                                    <div class="mission-badge" id="badgeShare">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" id="missionSave">
+                                    <div class="mission-icon">
+                                        <i class="fas fa-bookmark"></i>
+                                    </div>
+                                    <div class="mission-content">
+                                        <h4>Colecionador</h4>
+                                        <p>Salve 20 devocionais favoritos</p>
+                                        <div class="mission-progress">
+                                            <div class="progress-bar-mini">
+                                                <div class="progress-fill-mini" id="progressSave" style="width: 0%"></div>
+                                            </div>
+                                            <span class="progress-text" id="progressTextSave">0/20 salvos</span>
+                                        </div>
+                                    </div>
+                                    <div class="mission-badge" id="badgeSave">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Devotional Header -->
+                        <div class="devotional-header">
+                            <div class="devotional-title">
+                                <i class="fas fa-book-open"></i>
+                                <div>
+                                    <h2>Devocional Diário</h2>
+                                    <p>Alimente sua alma com a Palavra de Deus</p>
+                                </div>
+                            </div>
+                            <div class="devotional-date">
+                                <i class="fas fa-calendar-day"></i>
+                                <span id="devotionalDate"></span>
+                            </div>
+                        </div>
+
+                        <!-- Today's Devotional -->
+                        <div class="today-devotional">
+                            <div class="devotional-card main-devotional">
+                                <div class="devotional-badge">
+                                    <i class="fas fa-star"></i>
+                                    <span>Devocional de Hoje</span>
+                                </div>
+                                
+                                <h3 class="devotional-theme" id="todayTheme">Carregando...</h3>
+                                
+                                <div class="devotional-verse">
+                                    <i class="fas fa-quote-left"></i>
+                                    <p id="todayVerse">Carregando versículo...</p>
+                                    <span class="verse-reference" id="todayReference"></span>
+                                </div>
+
+                                <div class="devotional-reflection">
+                                    <h4><i class="fas fa-lightbulb"></i> Reflexão</h4>
+                                    <p id="todayReflection">Carregando reflexão...</p>
+                                </div>
+
+                                <div class="devotional-prayer">
+                                    <h4><i class="fas fa-praying-hands"></i> Oração</h4>
+                                    <p id="todayPrayer">Carregando oração...</p>
+                                </div>
+
+                                <div class="devotional-actions">
+                                    <button class="btn btn-primary" onclick="shareDevotional()">
+                                        <i class="fas fa-share-alt"></i> Compartilhar
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="saveDevotional()">
+                                        <i class="fas fa-bookmark"></i> Salvar
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="printDevotional()">
+                                        <i class="fas fa-print"></i> Imprimir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Devotional Calendar -->
+                        <div class="devotional-sections">
+                            <div class="devotional-calendar-section">
+                                <h3><i class="fas fa-calendar-alt"></i> Devocionais Anteriores</h3>
+                                <div class="calendar-grid" id="devotionalCalendar">
+                                    <!-- Calendar will be populated here -->
+                                </div>
+                            </div>
+
+                            <!-- Saved Devotionals -->
+                            <div class="saved-devotionals-section">
+                                <h3><i class="fas fa-bookmark"></i> Salvos</h3>
+                                <div class="saved-list" id="savedDevotionals">
+                                    <div class="empty-state">
+                                        <i class="fas fa-bookmark"></i>
+                                        <p>Nenhum devocional salvo</p>
+                                        <small>Clique em "Salvar" para guardar seus favoritos</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Language Selection -->
+                        <div class="devotional-language-section">
+                            <h3><i class="fas fa-language"></i> Idioma do Devocional</h3>
+                            <div class="language-selector">
+                                <button class="language-option active" data-lang="pt" onclick="switchDevotionalLanguage('pt')">
+                                    <i class="fas fa-flag"></i>
+                                    <div>
+                                        <strong>Português</strong>
+                                        <span>Devocionais em português</span>
+                                    </div>
+                                </button>
+                                <button class="language-option" data-lang="en" onclick="switchDevotionalLanguage('en')">
+                                    <i class="fas fa-flag-usa"></i>
+                                    <div>
+                                        <strong>English</strong>
+                                        <span>Devotionals in English</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Reading Plan -->
+                        <div class="reading-plan-section">
+                            <h3><i class="fas fa-book-reader"></i> Plano de Leitura</h3>
+                            <div class="reading-plan-card">
+                                <div class="plan-header">
+                                    <h4>Leia a Bíblia em 1 Ano</h4>
+                                    <span class="plan-progress">15% completo</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 15%"></div>
+                                </div>
+                                <div class="plan-today">
+                                    <p><strong>Leitura de Hoje:</strong></p>
+                                    <ul>
+                                        <li>Gênesis 15-17</li>
+                                        <li>Salmos 15</li>
+                                        <li>Mateus 15</li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-primary" onclick="openReadingPlan()">
+                                    <i class="fas fa-book"></i> Ver Plano Completo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Leaders Section -->
@@ -576,6 +815,196 @@
                             </thead>
                             <tbody></tbody>
                         </table>
+                    </div>
+                </section>
+
+                <!-- Bible Section -->
+                <section id="bible" class="content-section">
+                    <div class="bible-container">
+                        <!-- Bible Header -->
+                        <div class="bible-header">
+                            <div class="bible-title">
+                                <i class="fas fa-book-bible"></i>
+                                <h2>Bíblia Sagrada</h2>
+                            </div>
+                            <div class="bible-language-toggle">
+                                <button class="lang-btn active" data-lang="pt" onclick="switchBibleLanguage('pt')">
+                                    <i class="fas fa-flag"></i> Português
+                                </button>
+                                <button class="lang-btn" data-lang="en" onclick="switchBibleLanguage('en')">
+                                    <i class="fas fa-flag-usa"></i> English
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bible Navigation -->
+                        <div class="bible-navigation">
+                            <div class="bible-search">
+                                <input type="text" id="bibleSearch" placeholder="Buscar versículos, palavras ou temas...">
+                                <button class="btn btn-primary" onclick="searchBible()">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                            
+                            <div class="bible-selectors">
+                                <select id="bibleTestament" onchange="loadBibleBooks()">
+                                    <option value="">Selecione o Testamento</option>
+                                    <option value="old">Antigo Testamento</option>
+                                    <option value="new">Novo Testamento</option>
+                                </select>
+                                
+                                <select id="bibleBook" onchange="loadBibleChapters()">
+                                    <option value="">Selecione o Livro</option>
+                                </select>
+                                
+                                <select id="bibleChapter" onchange="loadBibleVerses()">
+                                    <option value="">Selecione o Capítulo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Bible Content Area -->
+                        <div class="bible-content-wrapper">
+                            <!-- Sidebar with Books -->
+                            <div class="bible-books-sidebar">
+                                <div class="bible-sidebar-header">
+                                    <h3>Livros da Bíblia</h3>
+                                    <button class="btn-icon" onclick="toggleBibleSidebar()">
+                                        <i class="fas fa-bars"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="bible-quick-access">
+                                    <h4><i class="fas fa-star"></i> Acesso Rápido</h4>
+                                    <div class="quick-links">
+                                        <button onclick="loadBiblePassage('Genesis', 1)">Gênesis 1</button>
+                                        <button onclick="loadBiblePassage('Psalms', 23)">Salmo 23</button>
+                                        <button onclick="loadBiblePassage('Proverbs', 3)">Provérbios 3</button>
+                                        <button onclick="loadBiblePassage('John', 3)">João 3</button>
+                                        <button onclick="loadBiblePassage('Romans', 8)">Romanos 8</button>
+                                        <button onclick="loadBiblePassage('Revelation', 21)">Apocalipse 21</button>
+                                    </div>
+                                </div>
+
+                                <div class="bible-books-list" id="bibleBooksList">
+                                    <!-- Books will be loaded here -->
+                                </div>
+                            </div>
+
+                            <!-- Main Reading Area -->
+                            <div class="bible-reading-area">
+                                <div class="bible-reading-header">
+                                    <div class="bible-passage-info">
+                                        <h3 id="biblePassageTitle">Selecione um livro para começar</h3>
+                                        <div class="bible-actions">
+                                            <button class="btn-icon" onclick="toggleFavoritePassage()" title="Favoritar">
+                                                <i class="far fa-heart"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="addBibleNote()" title="Adicionar Nota">
+                                                <i class="fas fa-sticky-note"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="shareBiblePassage()" title="Compartilhar">
+                                                <i class="fas fa-share-alt"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="printBiblePassage()" title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="increaseFontSize()" title="Aumentar Fonte">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <button class="btn-icon" onclick="decreaseFontSize()" title="Diminuir Fonte">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bible-verses-container" id="bibleVersesContainer">
+                                    <div class="bible-welcome">
+                                        <i class="fas fa-book-open"></i>
+                                        <h3>Bem-vindo à Bíblia Sagrada</h3>
+                                        <p>Selecione um livro no menu lateral ou use a busca para encontrar versículos específicos.</p>
+                                        
+                                        <div class="bible-daily-verse">
+                                            <h4><i class="fas fa-calendar-day"></i> Versículo do Dia</h4>
+                                            <div class="daily-verse-content" id="dailyVerseContent">
+                                                <p class="verse-text">"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna."</p>
+                                                <p class="verse-reference">João 3:16</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="bible-stats">
+                                            <div class="stat-item">
+                                                <i class="fas fa-book"></i>
+                                                <span class="number">66</span>
+                                                <span class="label">Livros</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <i class="fas fa-file-alt"></i>
+                                                <span class="number">1,189</span>
+                                                <span class="label">Capítulos</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <i class="fas fa-paragraph"></i>
+                                                <span class="number">31,102</span>
+                                                <span class="label">Versículos</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Navigation Buttons -->
+                                <div class="bible-navigation-buttons">
+                                    <button class="btn btn-secondary" onclick="previousChapter()" id="prevChapterBtn" disabled>
+                                        <i class="fas fa-chevron-left"></i> Capítulo Anterior
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="nextChapter()" id="nextChapterBtn" disabled>
+                                        Próximo Capítulo <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Notes and Favorites Sidebar -->
+                            <div class="bible-notes-sidebar">
+                                <div class="bible-tabs">
+                                    <button class="tab-btn active" onclick="switchBibleTab('favorites')">
+                                        <i class="fas fa-heart"></i> Favoritos
+                                    </button>
+                                    <button class="tab-btn" onclick="switchBibleTab('notes')">
+                                        <i class="fas fa-sticky-note"></i> Notas
+                                    </button>
+                                    <button class="tab-btn" onclick="switchBibleTab('history')">
+                                        <i class="fas fa-history"></i> Histórico
+                                    </button>
+                                </div>
+
+                                <div class="bible-tab-content">
+                                    <div id="favoritesTab" class="tab-pane active">
+                                        <div class="empty-state">
+                                            <i class="fas fa-heart"></i>
+                                            <p>Nenhum versículo favorito ainda</p>
+                                            <small>Clique no ❤️ para adicionar favoritos</small>
+                                        </div>
+                                    </div>
+
+                                    <div id="notesTab" class="tab-pane">
+                                        <div class="empty-state">
+                                            <i class="fas fa-sticky-note"></i>
+                                            <p>Nenhuma nota ainda</p>
+                                            <small>Clique no 📝 para adicionar notas</small>
+                                        </div>
+                                    </div>
+
+                                    <div id="historyTab" class="tab-pane">
+                                        <div class="empty-state">
+                                            <i class="fas fa-history"></i>
+                                            <p>Nenhum histórico ainda</p>
+                                            <small>Comece a ler para ver seu histórico</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>

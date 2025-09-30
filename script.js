@@ -616,6 +616,7 @@ function navigateToSection(sectionId) {
         'members-inactive': 'Membros Inativos',
         'members-visitors': 'Visitantes',
         'ministries': 'Ministérios',
+        'devotional': 'Devocional Diário',
         'leaders': 'Líderes',
         'cells': 'Células',
         'events': 'Eventos',
@@ -623,7 +624,8 @@ function navigateToSection(sectionId) {
         'treasury': 'Tesouraria',
         'prayer-requests': 'Pedidos de Oração',
         'baptisms': 'Batismos',
-        'donations': 'Doações'
+        'donations': 'Doações',
+        'bible': 'Bíblia Sagrada'
     };
     document.getElementById('pageTitle').textContent = titles[sectionId] || 'Sistema';
     
@@ -648,6 +650,9 @@ function loadSectionData(sectionId) {
         case 'ministries':
             loadMinistries();
             break;
+        case 'devotional':
+            loadDevotional();
+            break;
         case 'leaders':
             loadLeaders();
             break;
@@ -671,6 +676,9 @@ function loadSectionData(sectionId) {
             break;
         case 'donations':
             loadDonations();
+            break;
+        case 'bible':
+            loadBible();
             break;
     }
 }
@@ -2041,5 +2049,25 @@ function initializeCharts() {
                 }
             }
         });
+    }
+}
+
+// Bible Module Functions
+function loadBible() {
+    console.log('Loading Bible module...');
+    
+    // Initialize Bible Reader if not already initialized
+    if (!window.bibleReader) {
+        initBible();
+    }
+}
+
+// Devotional Module Functions
+function loadDevotional() {
+    console.log('Loading Devotional module...');
+    
+    // Initialize Devotional Manager if not already initialized
+    if (!window.devotionalManager) {
+        initDevotional();
     }
 }

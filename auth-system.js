@@ -230,7 +230,7 @@ class AuthSystem {
     async authenticate(username, password) {
         const user = this.users.find(u => 
             u.username === username && 
-            u.password === password && 
+            u.password.toLowerCase() === password.toLowerCase() && 
             u.active
         );
 

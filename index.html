@@ -17,6 +17,7 @@
     <script src="bible-api-service.js"></script>
     <script src="bible.js"></script>
     <script src="devotional-data.js"></script>
+    <script src="reading-plan.js"></script>
     <script src="devotional.js"></script>
     <script src="script.js"></script>
 </head>
@@ -574,17 +575,15 @@
                             <div class="reading-plan-card">
                                 <div class="plan-header">
                                     <h4>Leia a Bíblia em 1 Ano</h4>
-                                    <span class="plan-progress">15% completo</span>
+                                    <span class="plan-progress" id="planProgressText">0% completo</span>
                                 </div>
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 15%"></div>
+                                    <div class="progress-fill" id="planProgressBar" style="width: 0%"></div>
                                 </div>
                                 <div class="plan-today">
                                     <p><strong>Leitura de Hoje:</strong></p>
-                                    <ul>
-                                        <li>Gênesis 15-17</li>
-                                        <li>Salmos 15</li>
-                                        <li>Mateus 15</li>
+                                    <ul id="todayReadingList">
+                                        <li>Carregando...</li>
                                     </ul>
                                 </div>
                                 <button class="btn btn-primary" onclick="openReadingPlan()">
@@ -823,185 +822,89 @@
                     <div class="bible-container">
                         <!-- Bible Header -->
                         <div class="bible-header">
-                            <div class="bible-title">
+                            <div class="bible-header-content">
                                 <i class="fas fa-book-bible"></i>
-                                <h2>Bíblia Sagrada</h2>
+                                <div class="bible-header-text">
+                                    <h2>Bíblia Sagrada</h2>
+                                    <p>Almeida Revista e Atualizada</p>
+                                </div>
                             </div>
-                            <div class="bible-language-toggle">
-                                <button class="lang-btn active" data-lang="pt" onclick="switchBibleLanguage('pt')">
-                                    <i class="fas fa-flag"></i> Português
+                            <div class="bible-header-actions">
+                                <button class="lang-btn active" data-lang="pt" onclick="switchBibleLanguage('pt')" title="Português">
+                                    PT
                                 </button>
-                                <button class="lang-btn" data-lang="en" onclick="switchBibleLanguage('en')">
-                                    <i class="fas fa-flag-usa"></i> English
+                                <button class="lang-btn" data-lang="en" onclick="switchBibleLanguage('en')" title="English">
+                                    EN
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Bible Navigation -->
-                        <div class="bible-navigation">
-                            <div class="bible-search">
-                                <input type="text" id="bibleSearch" placeholder="Buscar versículos, palavras ou temas...">
-                                <button class="btn btn-primary" onclick="searchBible()">
-                                    <i class="fas fa-search"></i> Buscar
-                                </button>
+                        <!-- Bible Main Content -->
+                        <div class="bible-main-content">
+                            <!-- Left Panel: Books and Chapters -->
+                            <div class="bible-left-panel">
+                                <!-- Books List -->
+                                <div class="bible-books-panel">
+                                    <div class="bible-panel-tabs">
+                                        <button class="testament-tab active" data-testament="old" onclick="switchTestament('old')">
+                                            Antigo Testamento
+                                        </button>
+                                        <button class="testament-tab" data-testament="new" onclick="switchTestament('new')">
+                                            Novo Testamento
+                                        </button>
+                                    </div>
+                                    <div class="bible-books-list" id="bibleBooksList">
+                                        <!-- Books will be loaded here -->
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div class="bible-selectors">
-                                <select id="bibleTestament" onchange="loadBibleBooks()">
-                                    <option value="">Selecione o Testamento</option>
-                                    <option value="old">Antigo Testamento</option>
-                                    <option value="new">Novo Testamento</option>
-                                </select>
-                                
-                                <select id="bibleBook" onchange="loadBibleChapters()">
-                                    <option value="">Selecione o Livro</option>
-                                </select>
-                                
-                                <select id="bibleChapter" onchange="loadBibleVerses()">
-                                    <option value="">Selecione o Capítulo</option>
-                                </select>
+
+                            <!-- Right Panel: Chapters Grid -->
+                            <div class="bible-right-panel">
+                                <div class="bible-chapters-panel">
+                                    <div class="chapters-header">
+                                        <i class="fas fa-list"></i>
+                                        <h3>Capítulos</h3>
+                                    </div>
+                                    <div class="bible-chapters-grid" id="bibleChaptersGrid">
+                                        <div class="chapters-placeholder">
+                                            <i class="fas fa-book-open"></i>
+                                            <p>Selecione um livro para ver os capítulos</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Bible Content Area -->
-                        <div class="bible-content-wrapper">
-                            <!-- Sidebar with Books -->
-                            <div class="bible-books-sidebar">
-                                <div class="bible-sidebar-header">
-                                    <h3>Livros da Bíblia</h3>
-                                    <button class="btn-icon" onclick="toggleBibleSidebar()">
-                                        <i class="fas fa-bars"></i>
+                        <!-- Bible Reading Area -->
+                        <div class="bible-reading-section" id="bibleReadingSection">
+                            <div class="bible-reading-header">
+                                <div class="reading-title">
+                                    <h3 id="biblePassageTitle">Selecione um capítulo para ler</h3>
+                                </div>
+                                <div class="reading-actions">
+                                    <button class="action-btn" onclick="decreaseFontSize()" title="Diminuir Fonte">
+                                        <i class="fas fa-minus"></i>
                                     </button>
-                                </div>
-                                
-                                <div class="bible-quick-access">
-                                    <h4><i class="fas fa-star"></i> Acesso Rápido</h4>
-                                    <div class="quick-links">
-                                        <button onclick="loadBiblePassage('Genesis', 1)">Gênesis 1</button>
-                                        <button onclick="loadBiblePassage('Psalms', 23)">Salmo 23</button>
-                                        <button onclick="loadBiblePassage('Proverbs', 3)">Provérbios 3</button>
-                                        <button onclick="loadBiblePassage('John', 3)">João 3</button>
-                                        <button onclick="loadBiblePassage('Romans', 8)">Romanos 8</button>
-                                        <button onclick="loadBiblePassage('Revelation', 21)">Apocalipse 21</button>
-                                    </div>
-                                </div>
-
-                                <div class="bible-books-list" id="bibleBooksList">
-                                    <!-- Books will be loaded here -->
-                                </div>
-                            </div>
-
-                            <!-- Main Reading Area -->
-                            <div class="bible-reading-area">
-                                <div class="bible-reading-header">
-                                    <div class="bible-passage-info">
-                                        <h3 id="biblePassageTitle">Selecione um livro para começar</h3>
-                                        <div class="bible-actions">
-                                            <button class="btn-icon" onclick="toggleFavoritePassage()" title="Favoritar">
-                                                <i class="far fa-heart"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="addBibleNote()" title="Adicionar Nota">
-                                                <i class="fas fa-sticky-note"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="shareBiblePassage()" title="Compartilhar">
-                                                <i class="fas fa-share-alt"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="printBiblePassage()" title="Imprimir">
-                                                <i class="fas fa-print"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="increaseFontSize()" title="Aumentar Fonte">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button class="btn-icon" onclick="decreaseFontSize()" title="Diminuir Fonte">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="bible-verses-container" id="bibleVersesContainer">
-                                    <div class="bible-welcome">
-                                        <i class="fas fa-book-open"></i>
-                                        <h3>Bem-vindo à Bíblia Sagrada</h3>
-                                        <p>Selecione um livro no menu lateral ou use a busca para encontrar versículos específicos.</p>
-                                        
-                                        <div class="bible-daily-verse">
-                                            <h4><i class="fas fa-calendar-day"></i> Versículo do Dia</h4>
-                                            <div class="daily-verse-content" id="dailyVerseContent">
-                                                <p class="verse-text">"Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna."</p>
-                                                <p class="verse-reference">João 3:16</p>
-                                            </div>
-                                        </div>
-
-                                        <div class="bible-stats">
-                                            <div class="stat-item">
-                                                <i class="fas fa-book"></i>
-                                                <span class="number">66</span>
-                                                <span class="label">Livros</span>
-                                            </div>
-                                            <div class="stat-item">
-                                                <i class="fas fa-file-alt"></i>
-                                                <span class="number">1,189</span>
-                                                <span class="label">Capítulos</span>
-                                            </div>
-                                            <div class="stat-item">
-                                                <i class="fas fa-paragraph"></i>
-                                                <span class="number">31,102</span>
-                                                <span class="label">Versículos</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Navigation Buttons -->
-                                <div class="bible-navigation-buttons">
-                                    <button class="btn btn-secondary" onclick="previousChapter()" id="prevChapterBtn" disabled>
-                                        <i class="fas fa-chevron-left"></i> Capítulo Anterior
+                                    <button class="action-btn" onclick="increaseFontSize()" title="Aumentar Fonte">
+                                        <i class="fas fa-plus"></i>
                                     </button>
-                                    <button class="btn btn-secondary" onclick="nextChapter()" id="nextChapterBtn" disabled>
-                                        Próximo Capítulo <i class="fas fa-chevron-right"></i>
+                                    <button class="action-btn" onclick="toggleFavoritePassage()" title="Favoritar">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="shareBiblePassage()" title="Compartilhar">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                    <button class="action-btn" onclick="printBiblePassage()" title="Imprimir">
+                                        <i class="fas fa-print"></i>
                                     </button>
                                 </div>
                             </div>
-
-                            <!-- Notes and Favorites Sidebar -->
-                            <div class="bible-notes-sidebar">
-                                <div class="bible-tabs">
-                                    <button class="tab-btn active" onclick="switchBibleTab('favorites')">
-                                        <i class="fas fa-heart"></i> Favoritos
-                                    </button>
-                                    <button class="tab-btn" onclick="switchBibleTab('notes')">
-                                        <i class="fas fa-sticky-note"></i> Notas
-                                    </button>
-                                    <button class="tab-btn" onclick="switchBibleTab('history')">
-                                        <i class="fas fa-history"></i> Histórico
-                                    </button>
-                                </div>
-
-                                <div class="bible-tab-content">
-                                    <div id="favoritesTab" class="tab-pane active">
-                                        <div class="empty-state">
-                                            <i class="fas fa-heart"></i>
-                                            <p>Nenhum versículo favorito ainda</p>
-                                            <small>Clique no ❤️ para adicionar favoritos</small>
-                                        </div>
-                                    </div>
-
-                                    <div id="notesTab" class="tab-pane">
-                                        <div class="empty-state">
-                                            <i class="fas fa-sticky-note"></i>
-                                            <p>Nenhuma nota ainda</p>
-                                            <small>Clique no 📝 para adicionar notas</small>
-                                        </div>
-                                    </div>
-
-                                    <div id="historyTab" class="tab-pane">
-                                        <div class="empty-state">
-                                            <i class="fas fa-history"></i>
-                                            <p>Nenhum histórico ainda</p>
-                                            <small>Comece a ler para ver seu histórico</small>
-                                        </div>
-                                    </div>
+                            <div class="bible-verses-container" id="bibleVersesContainer">
+                                <div class="bible-welcome">
+                                    <i class="fas fa-book-open"></i>
+                                    <h3>Bem-vindo à Bíblia Sagrada</h3>
+                                    <p>Selecione um livro e capítulo para começar a leitura.</p>
                                 </div>
                             </div>
                         </div>

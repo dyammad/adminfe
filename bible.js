@@ -20,11 +20,8 @@ class BibleReader {
     // Initialize Bible Module
     init() {
         console.log('Initializing Bible Reader...');
+        this.currentTestament = 'old'; // Default to Old Testament
         this.loadBibleBooksList();
-        this.loadDailyVerse();
-        this.renderFavorites();
-        this.renderNotes();
-        this.renderHistory();
         
         // Prefetch popular chapters in background
         setTimeout(() => {
@@ -49,36 +46,29 @@ class BibleReader {
         if (!container) return;
 
         const lang = this.currentLanguage;
-        const oldTestament = bibleData.books[lang].old;
-        const newTestament = bibleData.books[lang].new;
+        const testament = this.currentTestament || 'old';
+        const books = bibleData.books[lang][testament];
 
-        let html = '<div class="testament-section">';
-        html += `<h4>${lang === 'pt' ? 'Antigo Testamento' : 'Old Testament'}</h4>`;
-        html += '<div class="books-grid">';
+        // Add fade effect
+        container.style.opacity = '0';
         
-        oldTestament.forEach(book => {
-            html += `<button class="book-btn" onclick="bibleReader.loadBook('${book.id}', 'old')" title="${book.name}">
-                ${book.abbr}
-            </button>`;
-        });
-        
-        html += '</div></div>';
-        html += '<div class="testament-section">';
-        html += `<h4>${lang === 'pt' ? 'Novo Testamento' : 'New Testament'}</h4>`;
-        html += '<div class="books-grid">';
-        
-        newTestament.forEach(book => {
-            html += `<button class="book-btn" onclick="bibleReader.loadBook('${book.id}', 'new')" title="${book.name}">
-                ${book.abbr}
-            </button>`;
-        });
-        
-        html += '</div></div>';
-        container.innerHTML = html;
+        setTimeout(() => {
+            let html = '';
+            books.forEach((book, index) => {
+                const isActive = this.currentBook && this.currentBook.id === book.id ? 'active' : '';
+                html += `<button class="book-btn ${isActive}" onclick="bibleReader.selectBook('${book.id}', '${testament}')" style="animation-delay: ${index * 0.02}s">
+                    <span>${book.name}</span>
+                    <span style="color: #95a5a6; font-size: 11px; font-weight: 600;">${book.chapters} cap.</span>
+                </button>`;
+            });
+            
+            container.innerHTML = html;
+            container.style.opacity = '1';
+        }, 150);
     }
 
-    // Load a specific book
-    loadBook(bookId, testament) {
+    // Select a book and show chapters
+    selectBook(bookId, testament) {
         const lang = this.currentLanguage;
         const books = bibleData.books[lang][testament];
         const book = books.find(b => b.id === bookId);
@@ -87,17 +77,32 @@ class BibleReader {
 
         this.currentBook = { ...book, testament };
         
-        // Update chapter selector
-        const chapterSelect = document.getElementById('bibleChapter');
-        if (chapterSelect) {
-            chapterSelect.innerHTML = '<option value="">Selecione o Capítulo</option>';
-            for (let i = 1; i <= book.chapters; i++) {
-                chapterSelect.innerHTML += `<option value="${i}">Capítulo ${i}</option>`;
-            }
-        }
+        // Update books list to show active state
+        this.loadBibleBooksList();
+        
+        // Load chapters grid
+        this.loadChaptersGrid();
+    }
 
-        // Load first chapter by default
-        this.loadChapter(1);
+    // Load chapters grid
+    loadChaptersGrid() {
+        const container = document.getElementById('bibleChaptersGrid');
+        if (!container || !this.currentBook) return;
+
+        let html = '<div class="chapters-grid">';
+        for (let i = 1; i <= this.currentBook.chapters; i++) {
+            const isActive = this.currentChapter === i ? 'active' : '';
+            const delay = (i - 1) * 0.01;
+            html += `<button class="chapter-btn ${isActive}" onclick="bibleReader.loadChapter(${i})" style="animation-delay: ${delay}s">${i}</button>`;
+        }
+        html += '</div>';
+        
+        container.innerHTML = html;
+    }
+
+    // Load a specific book (legacy support)
+    loadBook(bookId, testament) {
+        this.selectBook(bookId, testament);
     }
 
     // Load a specific chapter
@@ -118,7 +123,7 @@ class BibleReader {
         // Update UI
         this.renderVerses(verses);
         this.updatePassageTitle();
-        this.updateNavigationButtons();
+        this.loadChaptersGrid(); // Update chapters grid to show active chapter
         this.addToHistory(this.currentBook.name, chapterNum);
         
         // Hide loading state
@@ -156,7 +161,16 @@ class BibleReader {
         }
 
         // 3. Fallback to placeholder if API fails
-        console.log('⚠️ Usando versículos placeholder');
+        console.log('⚠️ API indisponível - Usando versículos de exemplo');
+        
+        // Show user-friendly message
+        this.showMessage(
+            lang === 'pt' 
+                ? 'API da Bíblia temporariamente indisponível. Mostrando conteúdo de exemplo.' 
+                : 'Bible API temporarily unavailable. Showing sample content.',
+            'info'
+        );
+        
         return this.generatePlaceholderVerses(key);
     }
 
@@ -165,12 +179,35 @@ class BibleReader {
         const numVerses = Math.floor(Math.random() * 20) + 10; // 10-30 verses
         const verses = [];
         
+        const sampleTexts = this.currentLanguage === 'pt' ? [
+            'E disse Deus: Haja luz. E houve luz.',
+            'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito.',
+            'O SENHOR é o meu pastor; nada me faltará.',
+            'Confia no SENHOR de todo o teu coração.',
+            'Tudo posso naquele que me fortalece.',
+            'A palavra de Deus é viva e eficaz.',
+            'Porque pela graça sois salvos, por meio da fé.',
+            'Buscai primeiro o reino de Deus e a sua justiça.',
+            'Deus é amor; e quem está em amor está em Deus.',
+            'Em tudo dai graças, porque esta é a vontade de Deus.'
+        ] : [
+            'And God said, Let there be light: and there was light.',
+            'For God so loved the world, that he gave his only begotten Son.',
+            'The LORD is my shepherd; I shall not want.',
+            'Trust in the LORD with all thine heart.',
+            'I can do all things through Christ which strengtheneth me.',
+            'For the word of God is quick, and powerful.',
+            'For by grace are ye saved through faith.',
+            'But seek ye first the kingdom of God, and his righteousness.',
+            'God is love; and he that dwelleth in love dwelleth in God.',
+            'In every thing give thanks: for this is the will of God.'
+        ];
+        
         for (let i = 1; i <= numVerses; i++) {
+            const sampleIndex = (i - 1) % sampleTexts.length;
             verses.push({
                 verse: i,
-                text: this.currentLanguage === 'pt' 
-                    ? `Este é o versículo ${i} do capítulo ${this.currentChapter}. O conteúdo completo seria carregado de uma API da Bíblia.`
-                    : `This is verse ${i} of chapter ${this.currentChapter}. The full content would be loaded from a Bible API.`
+                text: sampleTexts[sampleIndex]
             });
         }
         
@@ -210,31 +247,39 @@ class BibleReader {
         }
     }
 
-    // Update navigation buttons
-    updateNavigationButtons() {
-        const prevBtn = document.getElementById('prevChapterBtn');
-        const nextBtn = document.getElementById('nextChapterBtn');
+    // Switch testament
+    switchTestament(testament) {
+        this.currentTestament = testament;
+        this.currentBook = null;
+        this.currentChapter = null;
+        
+        // Update tab states
+        document.querySelectorAll('.testament-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.testament === testament);
+        });
 
-        if (prevBtn) {
-            prevBtn.disabled = this.currentChapter <= 1;
+        // Reload books list
+        this.loadBibleBooksList();
+        
+        // Clear chapters grid
+        const chaptersContainer = document.getElementById('bibleChaptersGrid');
+        if (chaptersContainer) {
+            chaptersContainer.innerHTML = `
+                <div class="chapters-placeholder">
+                    <i class="fas fa-book-open"></i>
+                    <p>Selecione um livro para ver os capítulos</p>
+                </div>`;
         }
-
-        if (nextBtn) {
-            nextBtn.disabled = this.currentChapter >= this.currentBook.chapters;
-        }
-    }
-
-    // Navigate to previous chapter
-    previousChapter() {
-        if (this.currentChapter > 1) {
-            this.loadChapter(this.currentChapter - 1);
-        }
-    }
-
-    // Navigate to next chapter
-    nextChapter() {
-        if (this.currentChapter < this.currentBook.chapters) {
-            this.loadChapter(this.currentChapter + 1);
+        
+        // Clear reading area
+        const versesContainer = document.getElementById('bibleVersesContainer');
+        if (versesContainer) {
+            versesContainer.innerHTML = `
+                <div class="bible-welcome">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Bem-vindo à Bíblia Sagrada</h3>
+                    <p>Selecione um livro e capítulo para começar a leitura.</p>
+                </div>`;
         }
     }
 
@@ -249,10 +294,12 @@ class BibleReader {
 
         // Reload current content
         this.loadBibleBooksList();
-        this.loadDailyVerse();
         
-        if (this.currentBook && this.currentChapter) {
-            this.loadChapter(this.currentChapter);
+        if (this.currentBook) {
+            this.loadChaptersGrid();
+            if (this.currentChapter) {
+                this.loadChapter(this.currentChapter);
+            }
         }
     }
 
@@ -760,33 +807,15 @@ function decreaseFontSize() {
     }
 }
 
-function previousChapter() {
-    if (bibleReader) {
-        bibleReader.previousChapter();
-    }
-}
-
-function nextChapter() {
-    if (bibleReader) {
-        bibleReader.nextChapter();
-    }
-}
-
-function switchBibleTab(tabName) {
-    if (bibleReader) {
-        bibleReader.switchTab(tabName);
-    }
-}
-
-function toggleBibleSidebar() {
-    if (bibleReader) {
-        bibleReader.toggleSidebar();
-    }
-}
-
 function loadBiblePassage(book, chapter) {
     if (bibleReader) {
         bibleReader.loadBiblePassage(book, chapter);
+    }
+}
+
+function switchTestament(testament) {
+    if (bibleReader) {
+        bibleReader.switchTestament(testament);
     }
 }
 

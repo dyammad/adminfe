@@ -30,6 +30,33 @@ class DevotionalManager {
         this.renderSavedDevotionals();
         this.updateMissions();
         this.renderMissions();
+        this.updateReadingPlanCard();
+    }
+    
+    // Update reading plan card
+    updateReadingPlanCard() {
+        if (typeof readingPlan === 'undefined') return;
+        
+        const stats = readingPlan.getStatistics();
+        const todayReading = readingPlan.getTodayReading();
+        
+        // Update progress text
+        const progressText = document.getElementById('planProgressText');
+        if (progressText) {
+            progressText.textContent = `${stats.percentage}% completo`;
+        }
+        
+        // Update progress bar
+        const progressBar = document.getElementById('planProgressBar');
+        if (progressBar) {
+            progressBar.style.width = `${stats.percentage}%`;
+        }
+        
+        // Update today's reading list
+        const readingList = document.getElementById('todayReadingList');
+        if (readingList && todayReading) {
+            readingList.innerHTML = todayReading.readings.map(r => `<li>${r}</li>`).join('');
+        }
     }
 
     // Load today's devotional
@@ -448,7 +475,161 @@ class DevotionalManager {
 
     // Open reading plan
     openReadingPlan() {
-        alert('Plano de Leitura Completo\n\nEm desenvolvimento...\n\nEm breve você terá acesso ao plano completo de leitura da Bíblia em 1 ano!');
+        if (typeof readingPlan !== 'undefined') {
+            this.showReadingPlanModal();
+        } else {
+            alert('Plano de Leitura Completo\n\nCarregando...');
+        }
+    }
+    
+    // Show reading plan modal
+    showReadingPlanModal() {
+        const stats = readingPlan.getStatistics();
+        const todayReading = readingPlan.getTodayReading();
+        
+        const modal = document.createElement('div');
+        modal.className = 'reading-plan-modal';
+        modal.innerHTML = `
+            <div class="reading-plan-modal-content">
+                <div class="reading-plan-header">
+                    <h2><i class="fas fa-book-reader"></i> Plano de Leitura Anual</h2>
+                    <button class="close-modal" onclick="this.closest('.reading-plan-modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="reading-plan-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>${stats.completed}</strong>
+                            <span>Dias Completos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-percentage"></i>
+                        <div>
+                            <strong>${stats.percentage}%</strong>
+                            <span>Progresso</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-fire"></i>
+                        <div>
+                            <strong>${stats.currentStreak}</strong>
+                            <span>Sequência Atual</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trophy"></i>
+                        <div>
+                            <strong>${stats.longestStreak}</strong>
+                            <span>Melhor Sequência</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="reading-plan-progress-bar">
+                    <div class="progress-fill" style="width: ${stats.percentage}%"></div>
+                    <span class="progress-label">${stats.completed} de 365 dias</span>
+                </div>
+                
+                <div class="today-reading-section">
+                    <h3><i class="fas fa-calendar-day"></i> Leitura de Hoje (Dia ${todayReading.day})</h3>
+                    <div class="today-readings">
+                        ${todayReading.readings.map(r => `
+                            <div class="reading-item">
+                                <i class="fas fa-book"></i>
+                                <span>${r}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="btn btn-primary" onclick="devotionalManager.markTodayComplete()">
+                        <i class="fas fa-check"></i> Marcar como Completo
+                    </button>
+                </div>
+                
+                <div class="reading-plan-actions">
+                    <button class="btn btn-secondary" onclick="devotionalManager.viewFullPlan()">
+                        <i class="fas fa-list"></i> Ver Plano Completo
+                    </button>
+                    <button class="btn btn-secondary" onclick="devotionalManager.resetReadingPlan()">
+                        <i class="fas fa-redo"></i> Resetar Progresso
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+    
+    // Mark today as complete
+    markTodayComplete() {
+        const today = new Date();
+        const start = new Date(today.getFullYear(), 0, 0);
+        const diff = today - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+        
+        const progress = readingPlan.markDayComplete(dayOfYear);
+        this.showMessage(`✅ Dia ${dayOfYear} marcado como completo! ${progress.percentage}% concluído`, 'success');
+        
+        // Close modal and reopen to update
+        const modal = document.querySelector('.reading-plan-modal');
+        if (modal) {
+            modal.remove();
+            this.showReadingPlanModal();
+        }
+    }
+    
+    // View full plan
+    viewFullPlan() {
+        const completedDays = readingPlan.loadCompletedDays();
+        const plan = readingPlan.generateCompletePlan();
+        
+        const modal = document.createElement('div');
+        modal.className = 'reading-plan-modal full-plan';
+        modal.innerHTML = `
+            <div class="reading-plan-modal-content large">
+                <div class="reading-plan-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Plano Completo - 365 Dias</h2>
+                    <button class="close-modal" onclick="this.closest('.reading-plan-modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="full-plan-grid">
+                    ${plan.map(day => `
+                        <div class="plan-day-card ${completedDays.includes(day.day) ? 'completed' : ''}">
+                            <div class="day-number">Dia ${day.day}</div>
+                            <div class="day-readings">
+                                ${day.readings.map(r => `<div>${r}</div>`).join('')}
+                            </div>
+                            ${completedDays.includes(day.day) ? '<i class="fas fa-check-circle"></i>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        // Close current modal
+        document.querySelector('.reading-plan-modal')?.remove();
+        document.body.appendChild(modal);
+    }
+    
+    // Reset reading plan
+    resetReadingPlan() {
+        if (confirm('Tem certeza que deseja resetar todo o progresso do plano de leitura?')) {
+            readingPlan.resetProgress();
+            this.showMessage('Progresso resetado com sucesso', 'info');
+            
+            // Close modal and reopen
+            const modal = document.querySelector('.reading-plan-modal');
+            if (modal) {
+                modal.remove();
+                this.showReadingPlanModal();
+            }
+        }
     }
 
     // Storage helpers

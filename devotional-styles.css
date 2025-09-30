@@ -736,9 +736,6 @@
         font-size: 24px;
     }
 
-    .category-btn span {
-        font-size: 12px;
-    }
 }
 
 /* Print Styles */
@@ -746,8 +743,9 @@
     .devotional-header,
     .devotional-actions,
     .devotional-sections,
-    .devotional-categories,
-    .reading-plan-section {
+    .devotional-language-section,
+    .reading-plan-section,
+    .reading-plan-modal {
         display: none !important;
     }
 
@@ -758,6 +756,21 @@
 
     .devotional-verse {
         page-break-inside: avoid;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reading-plan-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .full-plan-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .reading-plan-actions {
+        flex-direction: column;
     }
 }
 

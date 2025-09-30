@@ -62,11 +62,19 @@ class BibleAPIService {
         }
 
         try {
-            // Try primary API
+            // Try primary API with timeout
             const url = `${this.apis.primary}/${bookName}+${chapter}?translation=${translation}`;
             console.log('🔄 Buscando da API:', url);
             
-            const response = await fetch(url);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
+            const response = await fetch(url, { 
+                signal: controller.signal,
+                mode: 'cors'
+            });
+            
+            clearTimeout(timeoutId);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -90,13 +98,16 @@ class BibleAPIService {
             
             return null;
         } catch (error) {
-            console.error('Erro na API primária:', error);
+            console.error('Erro na API primária:', error.message);
             
             // Try fallback for Portuguese
             if (language === 'pt') {
+                console.log('🔄 Tentando API secundária (Bíblia Digital)...');
                 return await this.fetchFromBibliaDigital(bookId, chapter);
             }
             
+            // For English, try alternative method
+            console.log('⚠️ API indisponível, usando dados locais');
             return null;
         }
     }
@@ -105,12 +116,23 @@ class BibleAPIService {
     async fetchFromBibliaDigital(bookId, chapter) {
         try {
             const bookName = this.getPortugueseBookName(bookId);
-            if (!bookName) return null;
+            if (!bookName) {
+                console.log('⚠️ Nome do livro não encontrado para API secundária');
+                return null;
+            }
 
             const url = `${this.apis.secondary}/verses/nvi/${bookName}/${chapter}`;
             console.log('🔄 Tentando API secundária:', url);
             
-            const response = await fetch(url);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            const response = await fetch(url, {
+                signal: controller.signal,
+                mode: 'cors'
+            });
+            
+            clearTimeout(timeoutId);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -119,6 +141,7 @@ class BibleAPIService {
             const data = await response.json();
             
             if (data.verses && Array.isArray(data.verses)) {
+                console.log('✅ Dados carregados da API secundária');
                 return data.verses.map(v => ({
                     verse: v.number,
                     text: v.text
@@ -127,7 +150,8 @@ class BibleAPIService {
             
             return null;
         } catch (error) {
-            console.error('Erro na API secundária:', error);
+            console.error('❌ Erro na API secundária:', error.message);
+            console.log('⚠️ Todas as APIs falharam, usando dados de exemplo');
             return null;
         }
     }

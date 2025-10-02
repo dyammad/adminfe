@@ -8,10 +8,14 @@
     <link rel="stylesheet" href="auth-styles.css">
     <link rel="stylesheet" href="bible-styles.css">
     <link rel="stylesheet" href="devotional-styles.css">
+    <link rel="stylesheet" href="branch-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="branches-data.js"></script>
+    <script src="branch-isolation.js"></script>
     <script src="sample-data.js"></script>
     <script src="auth-system.js"></script>
+    <script src="branch-auth.js"></script>
     <script src="user-management.js"></script>
     <script src="bible-data.js"></script>
     <script src="bible-api-service.js"></script>
@@ -19,6 +23,8 @@
     <script src="devotional-data.js"></script>
     <script src="reading-plan.js"></script>
     <script src="devotional.js"></script>
+    <script src="branch-ui.js"></script>
+    <script src="branch-management.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
@@ -30,6 +36,15 @@
                 <h2>Sistema de Gestão da Igreja</h2>
             </div>
             <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginBranch">
+                        <i class="fas fa-building"></i> Filial
+                    </label>
+                    <select id="loginBranch" required>
+                        <option value="">Selecione sua filial...</option>
+                    </select>
+                    <small class="form-hint">Escolha a filial que você deseja acessar</small>
+                </div>
                 <div class="form-group">
                     <label for="username">Usuário</label>
                     <input type="text" id="username" required>
@@ -58,6 +73,15 @@
                 <p>Registre-se para acompanhar as atividades da igreja</p>
             </div>
             <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerBranch">
+                        <i class="fas fa-building"></i> Filial *
+                    </label>
+                    <select id="registerBranch" required>
+                        <option value="">Selecione sua filial...</option>
+                    </select>
+                    <small class="form-hint">Escolha a filial que você deseja se cadastrar</small>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="registerName">Nome Completo *</label>
@@ -160,6 +184,7 @@
                 <li><a href="#" data-section="baptisms"><i class="fas fa-water"></i> Batismos</a></li>
                 <li><a href="#" data-section="donations"><i class="fas fa-heart"></i> Doações</a></li>
                 <li><a href="#" data-section="bible"><i class="fas fa-book-bible"></i> Bíblia Sagrada</a></li>
+                <li><a href="#" data-section="branches-management"><i class="fas fa-building"></i> Filiais</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
@@ -909,6 +934,11 @@
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <!-- Branches Management Section -->
+                <section id="branches-management" class="content-section">
+                    <!-- Conteúdo será renderizado dinamicamente pelo branch-management.js -->
                 </section>
             </div>
         </main>

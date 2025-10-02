@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Sistema Multi-Filial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+        }
+
+        .test-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .test-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .test-result {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-result.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .test-result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .test-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .icon {
+            font-size: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .branch-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .branch-item {
+            padding: 10px;
+            background: white;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Teste do Sistema Multi-Filial</h1>
+            <p>Validação completa do sistema de 300 filiais com isolamento de dados</p>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Estatísticas do Sistema</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ Testes Automáticos</h2>
+            <div id="testResults"></div>
+            <button onclick="runAllTests()">▶️ Executar Todos os Testes</button>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Buscar Filiais</h2>
+            <input type="text" id="searchInput" placeholder="Digite estado, cidade ou nome..." 
+                   style="width: 100%; padding: 12px; border: 2px solid #e1e8ed; border-radius: 8px; margin-bottom: 10px;">
+            <button onclick="searchBranches()">🔍 Buscar</button>
+            <button onclick="showAllBranches()">📋 Mostrar Todas</button>
+            <div class="branch-list" id="branchList"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Teste de Isolamento</h2>
+            <button onclick="testIsolation()">🔒 Testar Isolamento de Dados</button>
+            <div id="isolationResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Informações do Sistema</h2>
+            <pre id="systemInfo"></pre>
+        </div>
+    </div>
+
+    <!-- Scripts do Sistema -->
+    <script src="branches-data.js"></script>
+    <script src="branch-isolation.js"></script>
+
+    <script>
+        // Carregar estatísticas
+        function loadStats() {
+            const stats = branchDB.getStatistics();
+            const statsGrid = document.getElementById('statsGrid');
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-label">Total de Filiais</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.active}</div>
+                    <div class="stat-label">Filiais Ativas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.inactive}</div>
+                    <div class="stat-label">Filiais Inativas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.totalMembers.toLocaleString()}</div>
+                    <div class="stat-label">Total de Membros</div>
+                </div>
+            `;
+        }
+
+        // Executar todos os testes
+        function runAllTests() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            const tests = [
+                {
+                    name: 'Banco de Filiais Carregado',
+                    test: () => branchDB.getAllBranches().length === 300
+                },
+                {
+                    name: 'Todas as filiais têm código único',
+                    test: () => {
+                        const codes = branchDB.getAllBranches().map(b => b.code);
+                        return codes.length === new Set(codes).size;
+                    }
+                },
+                {
+                    name: 'Filiais distribuídas por estados',
+                    test: () => {
+                        const states = [...new Set(branchDB.getAllBranches().map(b => b.stateUF))];
+                        return states.length >= 15;
+                    }
+                },
+                {
+                    name: 'Busca por ID funciona',
+                    test: () => {
+                        const branch = branchDB.getBranchById(1);
+                        return branch && branch.code === 'BR0001';
+                    }
+                },
+                {
+                    name: 'Busca por código funciona',
+                    test: () => {
+                        const branch = branchDB.getBranchByCode('BR0100');
+                        return branch && branch.id === 100;
+                    }
+                },
+                {
+                    name: 'Filtro por estado funciona',
+                    test: () => {
+                        const branches = branchDB.getBranchesByState('SP');
+                        return branches.length > 0 && branches.every(b => b.stateUF === 'SP');
+                    }
+                },
+                {
+                    name: 'Sistema de isolamento inicializado',
+                    test: () => typeof branchIsolation !== 'undefined'
+                },
+                {
+                    name: 'Estatísticas calculadas corretamente',
+                    test: () => {
+                        const stats = branchDB.getStatistics();
+                        return stats.total === 300 && stats.totalMembers > 0;
+                    }
+                }
+            ];
+
+            tests.forEach(test => {
+                const passed = test.test();
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${passed ? 'success' : 'error'}`;
+                resultDiv.innerHTML = `
+                    <span class="icon">${passed ? '✅' : '❌'}</span>
+                    <span>${test.name}</span>
+                `;
+                resultsDiv.appendChild(resultDiv);
+            });
+        }
+
+        // Buscar filiais
+        function searchBranches() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const branches = branchDB.searchBranches({ search: searchTerm });
+            displayBranches(branches);
+        }
+
+        // Mostrar todas as filiais
+        function showAllBranches() {
+            const branches = branchDB.getAllBranches();
+            displayBranches(branches);
+        }
+
+        // Exibir filiais
+        function displayBranches(branches) {
+            const listDiv = document.getElementById('branchList');
+            
+            if (branches.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Nenhuma filial encontrada</p>';
+                return;
+            }
+
+            listDiv.innerHTML = branches.slice(0, 50).map(branch => `
+                <div class="branch-item">
+                    <strong>${branch.code}</strong> - ${branch.name}<br>
+                    <small>📍 ${branch.city} - ${branch.stateUF} | 👤 ${branch.pastor} | 👥 ${branch.memberCount} membros</small>
+                </div>
+            `).join('');
+
+            if (branches.length > 50) {
+                listDiv.innerHTML += `<p style="text-align: center; color: #7f8c8d; margin-top: 10px;">Mostrando 50 de ${branches.length} filiais</p>`;
+            }
+        }
+
+        // Testar isolamento
+        function testIsolation() {
+            const resultsDiv = document.getElementById('isolationResults');
+            resultsDiv.innerHTML = '';
+
+            // Teste 1: Definir filial 1
+            branchIsolation.setCurrentBranch(1);
+            branchIsolation.setItem('testData', { value: 'Filial 1' });
+
+            // Teste 2: Definir filial 2
+            branchIsolation.setCurrentBranch(2);
+            branchIsolation.setItem('testData', { value: 'Filial 2' });
+
+            // Teste 3: Voltar para filial 1
+            branchIsolation.setCurrentBranch(1);
+            const data1 = branchIsolation.getItem('testData');
+
+            // Teste 4: Voltar para filial 2
+            branchIsolation.setCurrentBranch(2);
+            const data2 = branchIsolation.getItem('testData');
+
+            const test1Passed = data1 && data1.value === 'Filial 1';
+            const test2Passed = data2 && data2.value === 'Filial 2';
+
+            resultsDiv.innerHTML = `
+                <div class="test-result ${test1Passed ? 'success' : 'error'}">
+                    <span class="icon">${test1Passed ? '✅' : '❌'}</span>
+                    <span>Dados da Filial 1 isolados corretamente</span>
+                </div>
+                <div class="test-result ${test2Passed ? 'success' : 'error'}">
+                    <span class="icon">${test2Passed ? '✅' : '❌'}</span>
+                    <span>Dados da Filial 2 isolados corretamente</span>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">ℹ️</span>
+                    <span>Isolamento ${test1Passed && test2Passed ? 'FUNCIONANDO' : 'COM PROBLEMAS'}</span>
+                </div>
+            `;
+
+            // Limpar dados de teste
+            branchIsolation.setCurrentBranch(1);
+            branchIsolation.removeItem('testData');
+            branchIsolation.setCurrentBranch(2);
+            branchIsolation.removeItem('testData');
+        }
+
+        // Mostrar informações do sistema
+        function showSystemInfo() {
+            const info = {
+                totalBranches: branchDB.getAllBranches().length,
+                states: [...new Set(branchDB.getAllBranches().map(b => b.stateUF))].sort(),
+                stateCount: [...new Set(branchDB.getAllBranches().map(b => b.stateUF))].length,
+                activeBranches: branchDB.getActiveBranches().length,
+                totalMembers: branchDB.getStatistics().totalMembers,
+                byState: branchDB.getStatistics().byState
+            };
+
+            document.getElementById('systemInfo').textContent = JSON.stringify(info, null, 2);
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            showSystemInfo();
+            
+            // Mostrar primeiras 20 filiais
+            const branches = branchDB.getAllBranches().slice(0, 20);
+            displayBranches(branches);
+        });
+    </script>
+</body>
+</html>

@@ -287,8 +287,8 @@ function updateUIBasedOnPermissions() {
         { element: '[data-section="pastor-agenda"]', permission: 'agenda.view' },
         { element: '[data-section="treasury"]', permission: 'treasury.view' },
         { element: '[data-section="prayer-requests"]', permission: 'prayers.view' },
-        { element: '[data-section="baptisms"]', permission: 'baptisms.view' },
-        { element: '[data-section="donations"]', permission: 'donations.view' }
+        { element: '[data-section="baptisms"]', permission: 'baptisms.view' }
+        // Doações sempre visível para todos (membros podem doar)
     ];
     
     menuItems.forEach(item => {
@@ -326,8 +326,8 @@ function updateActionButtons() {
         { selector: 'button[onclick="openEventModal()"]', permission: 'events.create' },
         { selector: 'button[onclick="openAgendaModal()"]', permission: 'agenda.create' },
         { selector: 'button[onclick="openPrayerModal()"]', permission: 'prayers.create' },
-        { selector: 'button[onclick="openBaptismModal()"]', permission: 'baptisms.create' },
-        { selector: 'button[onclick="openDonationModal()"]', permission: 'donations.create' }
+        { selector: 'button[onclick="openBaptismModal()"]', permission: 'baptisms.create' }
+        // Botão de doação sempre visível (membros podem doar)
     ];
     
     createButtons.forEach(button => {
@@ -882,24 +882,70 @@ function loadMinistries() {
     const grid = document.getElementById('ministriesGrid');
     grid.innerHTML = '';
     
+    // Verificar se usuário pode gerenciar ministérios
+    const canManageMinistries = window.authSystem && window.authSystem.hasPermission('ministries.edit');
+    
+    // Mostrar/ocultar botão de adicionar ministério
+    const addMinistryBtn = document.getElementById('addMinistryBtn');
+    if (addMinistryBtn) {
+        addMinistryBtn.style.display = canManageMinistries ? 'inline-flex' : 'none';
+    }
+    
     ministries.forEach(ministry => {
         const card = document.createElement('div');
         card.className = 'ministry-card';
+        
+        // Buscar telefone do líder (simulado - em produção viria do banco)
+        const leaderPhone = ministry.leaderPhone || '(11) 98765-4321';
+        
         card.innerHTML = `
             <h3>${ministry.name}</h3>
             <p>${ministry.description}</p>
-            <div class="leader">Líder: ${ministry.leader}</div>
-            <div style="margin-top: 15px;">
-                <button class="btn btn-secondary" onclick="editMinistry(${ministry.id})">
-                    <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger" onclick="deleteMinistry(${ministry.id})">
-                    <i class="fas fa-trash"></i> Excluir
-                </button>
+            <div class="leader">
+                Líder: <span class="leader-name" onclick="showLeaderContact('${ministry.leader}', '${leaderPhone}')" 
+                       style="color: #3498db; cursor: pointer; text-decoration: underline;" 
+                       title="Clique para ver contato">
+                    ${ministry.leader}
+                </span>
             </div>
+            ${canManageMinistries ? `
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="editMinistry(${ministry.id})">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteMinistry(${ministry.id})">
+                        <i class="fas fa-trash"></i> Excluir
+                    </button>
+                </div>
+            ` : ''}
         `;
         grid.appendChild(card);
     });
+}
+
+// Função para mostrar contato do líder
+function showLeaderContact(leaderName, leaderPhone) {
+    const message = `
+        📞 Contato do Líder
+        
+        Nome: ${leaderName}
+        Telefone: ${leaderPhone}
+        
+        Clique em OK para copiar o número
+    `;
+    
+    if (confirm(message)) {
+        // Copiar para clipboard
+        navigator.clipboard.writeText(leaderPhone).then(() => {
+            if (window.authSystem) {
+                window.authSystem.showMessage(`Telefone copiado: ${leaderPhone}`, 'success');
+            } else {
+                alert(`Telefone copiado: ${leaderPhone}`);
+            }
+        }).catch(() => {
+            alert(`Telefone: ${leaderPhone}`);
+        });
+    }
 }
 
 // Modal functions - Removidas funções duplicadas, mantidas apenas as versões completas abaixo
@@ -1362,6 +1408,15 @@ function loadEvents() {
     const grid = document.getElementById('eventsGrid');
     grid.innerHTML = '';
     
+    // Verificar se usuário pode gerenciar eventos
+    const canManageEvents = window.authSystem && window.authSystem.hasPermission('events.edit');
+    
+    // Mostrar/ocultar botão de adicionar evento
+    const addEventBtn = document.getElementById('addEventBtn');
+    if (addEventBtn) {
+        addEventBtn.style.display = canManageEvents ? 'inline-flex' : 'none';
+    }
+    
     events.forEach(event => {
         const card = document.createElement('div');
         card.className = 'event-card';
@@ -1374,14 +1429,16 @@ function loadEvents() {
                 <h3>${event.title}</h3>
                 <p>${event.description}</p>
                 <p><strong>Local:</strong> ${event.location}</p>
-                <div style="margin-top: 15px;">
-                    <button class="btn btn-secondary" onclick="editEvent(${event.id})">
-                        <i class="fas fa-edit"></i> Editar
-                    </button>
-                    <button class="btn btn-danger" onclick="deleteEvent(${event.id})">
-                        <i class="fas fa-trash"></i> Excluir
-                    </button>
-                </div>
+                ${canManageEvents ? `
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-secondary" onclick="editEvent(${event.id})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         `;
         grid.appendChild(card);
@@ -1583,6 +1640,9 @@ function loadPrayerRequests() {
     const grid = document.getElementById('prayerRequestsGrid');
     grid.innerHTML = '';
     
+    // Verificar se usuário pode gerenciar pedidos de oração
+    const canManagePrayer = window.authSystem && window.authSystem.hasPermission('prayer.edit');
+    
     prayerRequests.forEach(request => {
         const card = document.createElement('div');
         card.className = `prayer-card ${request.status === 'answered' ? 'answered' : ''}`;
@@ -1592,14 +1652,16 @@ function loadPrayerRequests() {
                 <span>${formatDate(request.date)}</span>
             </div>
             <div class="prayer-text">${request.request}</div>
-            <div>
-                <button class="btn btn-success" onclick="markAnswered(${request.id})">
-                    <i class="fas fa-check"></i> Marcar como Respondido
-                </button>
-                <button class="btn btn-secondary" onclick="editPrayerRequest(${request.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </div>
+            ${canManagePrayer ? `
+                <div>
+                    <button class="btn btn-success" onclick="markAnswered(${request.id})">
+                        <i class="fas fa-check"></i> Marcar como Respondido
+                    </button>
+                    <button class="btn btn-secondary" onclick="editPrayerRequest(${request.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            ` : ''}
         `;
         grid.appendChild(card);
     });
@@ -1686,34 +1748,64 @@ function loadBaptisms() {
 }
 
 function loadDonations() {
+    // Verificar se usuário pode ver histórico de doações
+    const canViewDonations = window.authSystem && window.authSystem.hasPermission('donations.view');
+    
     const tithes = donations.filter(d => d.type === 'tithe').reduce((sum, d) => sum + d.amount, 0);
     const offerings = donations.filter(d => d.type === 'offering').reduce((sum, d) => sum + d.amount, 0);
     const special = donations.filter(d => d.type === 'special').reduce((sum, d) => sum + d.amount, 0);
     
-    document.getElementById('tithesTotal').textContent = `R$ ${tithes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-    document.getElementById('offeringsTotal').textContent = `R$ ${offerings.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-    document.getElementById('specialDonationsTotal').textContent = `R$ ${special.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+    // Mostrar/ocultar resumo e tabela baseado nas permissões
+    const summaryDiv = document.getElementById('donationsSummary');
+    const tableContainer = document.getElementById('donationsTableContainer');
     
-    const tbody = document.querySelector('#donationsTable tbody');
-    tbody.innerHTML = '';
-    
-    donations.forEach(donation => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${formatDate(donation.date)}</td>
-            <td>${donation.donor}</td>
-            <td>${donation.type === 'tithe' ? 'Dízimo' : donation.type === 'offering' ? 'Oferta' : 'Especial'}</td>
-            <td>R$ ${donation.amount.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-            <td>${donation.method}</td>
-            <td>${donation.notes || ''}</td>
-            <td>
-                <button class="btn btn-secondary" onclick="editDonation(${donation.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
+    if (canViewDonations) {
+        // Admin vê tudo
+        if (summaryDiv) summaryDiv.style.display = 'grid';
+        if (tableContainer) tableContainer.style.display = 'block';
+        
+        document.getElementById('tithesTotal').textContent = `R$ ${tithes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        document.getElementById('offeringsTotal').textContent = `R$ ${offerings.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        document.getElementById('specialDonationsTotal').textContent = `R$ ${special.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        
+        const tbody = document.querySelector('#donationsTable tbody');
+        tbody.innerHTML = '';
+        
+        donations.forEach(donation => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${formatDate(donation.date)}</td>
+                <td>${donation.donor}</td>
+                <td>${donation.type === 'tithe' ? 'Dízimo' : donation.type === 'offering' ? 'Oferta' : 'Especial'}</td>
+                <td>R$ ${donation.amount.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                <td>${donation.method}</td>
+                <td>${donation.notes || ''}</td>
+                <td>
+                    <button class="btn btn-secondary" onclick="editDonation(${donation.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    } else {
+        // Membro vê apenas mensagem para doar
+        if (summaryDiv) summaryDiv.style.display = 'none';
+        if (tableContainer) {
+            tableContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; background: #ecf0f1; border-radius: 8px;">
+                    <i class="fas fa-heart" style="font-size: 48px; color: #e74c3c; margin-bottom: 20px;"></i>
+                    <h3>Faça sua Doação</h3>
+                    <p style="color: #7f8c8d; margin: 20px 0;">
+                        Clique no botão "Registrar Doação" acima para fazer sua contribuição.
+                    </p>
+                    <p style="color: #95a5a6; font-size: 14px;">
+                        "Cada um contribua segundo propôs no seu coração, não com tristeza ou por necessidade; porque Deus ama ao que dá com alegria." - 2 Coríntios 9:7
+                    </p>
+                </div>
+            `;
+        }
+    }
 }
 
 // Utility functions

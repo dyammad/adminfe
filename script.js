@@ -65,6 +65,7 @@ function initializeApp() {
     document.getElementById('donationForm').addEventListener('submit', handleDonationSubmit);
     document.getElementById('agendaForm').addEventListener('submit', handleAgendaSubmit);
     document.getElementById('transactionForm').addEventListener('submit', handleTransactionSubmit);
+    document.getElementById('profileForm').addEventListener('submit', handleProfileSubmit);
     
     // Transaction type change handler
     document.getElementById('transactionType').addEventListener('change', handleTransactionTypeChange);
@@ -198,6 +199,10 @@ function handleLogout() {
 function showRegisterForm() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('registerScreen').style.display = 'flex';
+    // Populate the branch selection dropdown when the form is shown
+    if (window.populateBranchSelect) {
+        window.populateBranchSelect('registerBranchSelect');
+    }
 }
 
 function showLoginForm() {
@@ -222,8 +227,15 @@ async function handleRegister(e) {
         birthdate: document.getElementById('registerBirthdate').value,
         username: document.getElementById('registerUsername').value,
         password: document.getElementById('registerPassword').value,
-        howFound: document.getElementById('registerHowFound').value
+        howFound: document.getElementById('registerHowFound').value,
+        branchId: document.getElementById('registerBranchSelect').value
     };
+    
+    // Validar seleção de filial
+    if (!formData.branchId) {
+        window.authSystem.showMessage('Você deve selecionar uma filial', 'error');
+        return;
+    }
     
     // Validar confirmação de senha
     const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
@@ -340,6 +352,20 @@ function updateUserInfo() {
         userNameElement.title = `${user.name} (${role?.name || user.role})`;
     }
     
+    // Atualizar informação da filial
+    const branchInfoElement = document.getElementById('userBranchInfo');
+    if (branchInfoElement && user.branchId && window.branches) {
+        const branch = window.branches.find(b => b.id == user.branchId);
+        if (branch) {
+            branchInfoElement.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${branch.name}`;
+            branchInfoElement.style.color = '#3498db';
+        } else {
+            branchInfoElement.textContent = 'Filial não definida';
+        }
+    } else if (branchInfoElement) {
+        branchInfoElement.textContent = '';
+    }
+    
     // Adicionar indicador de role se não existir
     let roleIndicator = document.querySelector('.user-role-indicator');
     if (!roleIndicator && role) {
@@ -451,22 +477,31 @@ function updateMemberTable(tableId, data, type) {
         const row = document.createElement('tr');
         
         if (type === 'active') {
+            const itemId = typeof item.id === 'string' ? `'${item.id}'` : item.id;
+            const isNewMember = item.isNew === true;
+            const rowStyle = isNewMember ? 'style="color: #e74c3c; font-weight: bold;"' : '';
+            const newBadge = isNewMember ? '<span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px;">NOVO</span>' : '';
+            
             row.innerHTML = `
-                <td>${item.name}</td>
-                <td>${item.email}</td>
-                <td>${item.phone}</td>
-                <td>${item.birthDate ? new Date(item.birthDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
-                <td>${item.cell || 'Não definida'}</td>
+                <td ${rowStyle}>${item.name}${newBadge}</td>
+                <td ${rowStyle}>${item.email}</td>
+                <td ${rowStyle}>${item.phone}</td>
+                <td ${rowStyle}>${item.birthDate ? new Date(item.birthDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
+                <td ${rowStyle}>${item.cell || 'Não definida'}</td>
                 <td>
-                    <button class="btn-icon" onclick="editMember(${item.id})" title="Editar">
+                    <button class="btn-icon btn-info" onclick="requestBaptism(${itemId})" title="Solicitar Batismo">
+                        <i class="fas fa-water"></i>
+                    </button>
+                    <button class="btn-icon" onclick="editMember(${itemId})" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-icon btn-danger" onclick="deleteMember(${item.id})" title="Excluir">
+                    <button class="btn-icon btn-danger" onclick="deleteMember(${itemId})" title="Excluir">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
         } else if (type === 'inactive') {
+            const itemId = typeof item.id === 'string' ? `'${item.id}'` : item.id;
             row.innerHTML = `
                 <td>${item.name}</td>
                 <td>${item.email}</td>
@@ -474,29 +509,31 @@ function updateMemberTable(tableId, data, type) {
                 <td>${item.inactiveDate ? new Date(item.inactiveDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
                 <td>${item.inactiveReason || 'Não informado'}</td>
                 <td>
-                    <button class="btn-icon" onclick="reactivateMember(${item.id})" title="Reativar">
+                    <button class="btn-icon" onclick="reactivateMember(${itemId})" title="Reativar">
                         <i class="fas fa-undo"></i>
                     </button>
-                    <button class="btn-icon btn-danger" onclick="deleteMember(${item.id})" title="Excluir">
+                    <button class="btn-icon btn-danger" onclick="deleteMember(${itemId})" title="Excluir">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
         } else if (type === 'visitors') {
+            const itemId = typeof item.id === 'string' ? `'${item.id}'` : item.id;
             row.innerHTML = `
                 <td>${item.name}</td>
                 <td>${item.email}</td>
                 <td>${item.phone}</td>
+                <td>${item.branchName || 'Não informado'}</td>
                 <td>${item.visitDate ? new Date(item.visitDate).toLocaleDateString('pt-BR') : 'N/A'}</td>
                 <td>${getHowFoundText(item.howFound)}</td>
                 <td>
-                    <button class="btn-icon" onclick="convertToMember(${item.id})" title="Converter em Membro">
+                    <button class="btn-icon" onclick="convertToMember(${itemId})" title="Converter em Membro">
                         <i class="fas fa-user-plus"></i>
                     </button>
-                    <button class="btn-icon" onclick="editVisitor(${item.id})" title="Editar">
+                    <button class="btn-icon" onclick="editVisitor(${itemId})" title="Editar">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-icon btn-danger" onclick="deleteVisitor(${item.id})" title="Excluir">
+                    <button class="btn-icon btn-danger" onclick="deleteVisitor(${itemId})" title="Excluir">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -751,10 +788,54 @@ function populateCellFilters() {
 
 // Member management functions
 function loadActiveMembers() {
-    if (!sampleData.members) return;
+    let allActiveMembers = [];
     
-    const activeMembers = sampleData.members.filter(m => m.status === 'active');
-    updateMemberTable('activeMembersTable', activeMembers, 'active');
+    // Adicionar membros do sample data
+    if (sampleData.members) {
+        const sampleMembers = sampleData.members
+            .filter(m => m.status === 'active')
+            .map(m => ({
+                ...m,
+                createdAt: m.joinedAt || m.createdAt,
+                isNew: false
+            }));
+        allActiveMembers = sampleMembers;
+    }
+    
+    // Adicionar membros do authSystem
+    if (window.authSystem && window.authSystem.users) {
+        const authMembers = window.authSystem.users
+            .filter(u => u.role === 'member' && u.active)
+            .map(u => {
+                const createdDate = new Date(u.createdAt || u.approvedAt);
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+                
+                return {
+                    id: `auth_${u.id}`,
+                    name: u.name,
+                    email: u.email,
+                    phone: u.phone || 'Não informado',
+                    birthDate: u.birthdate || '',
+                    cell: u.cell || 'Não definida',
+                    status: 'active',
+                    branchId: u.branchId,
+                    createdAt: u.createdAt || u.approvedAt,
+                    isNew: createdDate > oneWeekAgo
+                };
+            });
+        
+        allActiveMembers = [...allActiveMembers, ...authMembers];
+    }
+    
+    // Ordenar: novos membros primeiro (por data de criação decrescente)
+    allActiveMembers.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return dateB - dateA; // Mais recentes primeiro
+    });
+    
+    updateMemberTable('activeMembersTable', allActiveMembers, 'active');
 }
 
 function loadInactiveMembers() {
@@ -765,9 +846,35 @@ function loadInactiveMembers() {
 }
 
 function loadVisitors() {
-    if (!sampleData.visitors) return;
+    // Combinar visitantes do sample data com visitantes cadastrados
+    let allVisitors = [];
     
-    updateMemberTable('visitorsTable', sampleData.visitors, 'visitors');
+    // Adicionar visitantes do sample data
+    if (sampleData.visitors) {
+        allVisitors = [...sampleData.visitors];
+    }
+    
+    // Adicionar visitantes cadastrados pelo sistema de autenticação
+    if (window.authSystem && window.authSystem.users) {
+        const registeredVisitors = window.authSystem.users
+            .filter(u => u.role === 'visitor')
+            .map(u => ({
+                id: `auth_${u.id}`,
+                name: u.name,
+                email: u.email,
+                phone: u.phone || 'Não informado',
+                visitDate: u.createdAt,
+                howFound: u.howFound || 'Não informado',
+                branchId: u.branchId,
+                branchName: window.branches?.find(b => b.id == u.branchId)?.name || 'Não informado',
+                approved: u.approved,
+                active: u.active
+            }));
+        
+        allVisitors = [...allVisitors, ...registeredVisitors];
+    }
+    
+    updateMemberTable('visitorsTable', allVisitors, 'visitors');
 }
 
 // Ministry management
@@ -795,25 +902,7 @@ function loadMinistries() {
     });
 }
 
-// Modal functions
-function openMemberModal() {
-    document.getElementById('memberModal').style.display = 'block';
-}
-
-function closeMemberModal() {
-    document.getElementById('memberModal').style.display = 'none';
-    document.getElementById('memberForm').reset();
-}
-
-function openVisitorModal() {
-    // Similar to member modal but for visitors
-    openMemberModal();
-}
-
-function openMinistryModal() {
-    // Would open ministry modal
-    alert('Modal de ministério em desenvolvimento');
-}
+// Modal functions - Removidas funções duplicadas, mantidas apenas as versões completas abaixo
 
 function handleMemberSubmit(e) {
     e.preventDefault();
@@ -1059,26 +1148,33 @@ function handleDonationSubmit(e) {
 function handleAgendaSubmit(e) {
     e.preventDefault();
     
-    const formData = new FormData(e.target);
     const agendaData = {
-        title: formData.get('title'),
-        description: formData.get('description'),
-        date: formData.get('date'),
-        time: formData.get('time'),
-        location: formData.get('location'),
-        priority: formData.get('priority')
+        title: document.getElementById('agendaTitle').value,
+        description: document.getElementById('agendaDescription').value,
+        date: document.getElementById('agendaDate').value,
+        time: document.getElementById('agendaTime').value,
+        location: document.getElementById('agendaLocation').value,
+        priority: document.getElementById('agendaPriority').value
     };
     
     if (currentEditId) {
         const index = agenda.findIndex(a => a.id === currentEditId);
         if (index > -1) {
             agenda[index] = { ...agenda[index], ...agendaData };
-            showAlert('Compromisso atualizado com sucesso!', 'success');
+            if (window.authSystem) {
+                window.authSystem.showMessage('Compromisso atualizado com sucesso!', 'success');
+            } else {
+                alert('Compromisso atualizado com sucesso!');
+            }
         }
     } else {
         agendaData.id = Date.now();
         agenda.push(agendaData);
-        showAlert('Compromisso adicionado com sucesso!', 'success');
+        if (window.authSystem) {
+            window.authSystem.showMessage('Compromisso adicionado com sucesso!', 'success');
+        } else {
+            alert('Compromisso adicionado com sucesso!');
+        }
     }
     
     loadPastorAgenda();
@@ -1213,6 +1309,23 @@ function loadLeaders() {
 }
 
 function loadCells() {
+    // Mostrar/ocultar botões baseado nas permissões
+    const canManageCells = window.authSystem && window.authSystem.hasPermission('cells.create');
+    const requestCellBtn = document.getElementById('requestCellBtn');
+    const addCellBtn = document.getElementById('addCellBtn');
+    
+    if (requestCellBtn && addCellBtn) {
+        if (canManageCells) {
+            // Admin vê apenas o botão de adicionar célula
+            requestCellBtn.style.display = 'none';
+            addCellBtn.style.display = 'inline-flex';
+        } else {
+            // Membro vê apenas o botão de solicitar participação
+            requestCellBtn.style.display = 'inline-flex';
+            addCellBtn.style.display = 'none';
+        }
+    }
+    
     const tbody = document.querySelector('#cellsTable tbody');
     tbody.innerHTML = '';
     
@@ -1227,12 +1340,18 @@ function loadCells() {
             <td>${cell.time || 'Não definido'}</td>
             <td>${memberCount}</td>
             <td>
-                <button class="btn btn-secondary" onclick="editCell(${cell.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-danger" onclick="deleteCell(${cell.id})">
-                    <i class="fas fa-trash"></i>
-                </button>
+                ${canManageCells ? `
+                    <button class="btn btn-secondary" onclick="editCell(${cell.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteCell(${cell.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                ` : `
+                    <button class="btn btn-success btn-sm" onclick="requestJoinCell(${cell.id})">
+                        <i class="fas fa-user-plus"></i> Participar
+                    </button>
+                `}
             </td>
         `;
         tbody.appendChild(row);
@@ -1269,11 +1388,119 @@ function loadEvents() {
     });
 }
 
+function generateSimpleCalendar() {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    
+    let calendarHTML = `
+        <div style="text-align: center; margin-bottom: 10px; font-weight: bold;">
+            ${monthNames[currentMonth]} ${currentYear}
+        </div>
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+                <tr style="background: #ecf0f1;">
+                    <th style="padding: 5px; font-size: 12px;">Dom</th>
+                    <th style="padding: 5px; font-size: 12px;">Seg</th>
+                    <th style="padding: 5px; font-size: 12px;">Ter</th>
+                    <th style="padding: 5px; font-size: 12px;">Qua</th>
+                    <th style="padding: 5px; font-size: 12px;">Qui</th>
+                    <th style="padding: 5px; font-size: 12px;">Sex</th>
+                    <th style="padding: 5px; font-size: 12px;">Sáb</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    let day = 1;
+    for (let i = 0; i < 6; i++) {
+        calendarHTML += '<tr>';
+        for (let j = 0; j < 7; j++) {
+            if (i === 0 && j < firstDay) {
+                calendarHTML += '<td style="padding: 8px;"></td>';
+            } else if (day > daysInMonth) {
+                calendarHTML += '<td style="padding: 8px;"></td>';
+            } else {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasEvent = agenda.some(a => a.date === dateStr);
+                const isToday = day === today.getDate();
+                
+                let style = 'padding: 8px; border-radius: 4px;';
+                if (isToday) style += ' background: #3498db; color: white; font-weight: bold;';
+                else if (hasEvent) style += ' background: #e74c3c; color: white;';
+                
+                calendarHTML += `<td style="${style}" title="${hasEvent ? 'Há compromissos neste dia' : ''}">${day}</td>`;
+                day++;
+            }
+        }
+        calendarHTML += '</tr>';
+        if (day > daysInMonth) break;
+    }
+    
+    calendarHTML += '</tbody></table>';
+    
+    const calendarDiv = document.getElementById('simpleCalendar');
+    if (calendarDiv) {
+        calendarDiv.innerHTML = calendarHTML;
+    }
+}
+
 function loadPastorAgenda() {
+    // Inicializar agenda com dados de exemplo se estiver vazia
+    if (agenda.length === 0) {
+        const today = new Date();
+        agenda = [
+            {
+                id: 1,
+                title: 'Culto Dominical',
+                description: 'Pregação e louvor',
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7).toISOString().split('T')[0],
+                time: '10:00',
+                location: 'Templo Principal',
+                priority: 'high'
+            },
+            {
+                id: 2,
+                title: 'Reunião de Líderes',
+                description: 'Planejamento mensal',
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3).toISOString().split('T')[0],
+                time: '19:00',
+                location: 'Sala de Reuniões',
+                priority: 'medium'
+            },
+            {
+                id: 3,
+                title: 'Visita Hospitalar',
+                description: 'Visitar irmão João',
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString().split('T')[0],
+                time: '14:00',
+                location: 'Hospital São Lucas',
+                priority: 'high'
+            },
+            {
+                id: 4,
+                title: 'Estudo Bíblico',
+                description: 'Estudo sobre Romanos',
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5).toISOString().split('T')[0],
+                time: '20:00',
+                location: 'Templo Principal',
+                priority: 'medium'
+            }
+        ];
+    }
+    
+    // Gerar calendário
+    generateSimpleCalendar();
+    
     const agendaList = document.getElementById('agendaList');
     agendaList.innerHTML = '<h3>Próximos Compromissos</h3>';
     
-    const sortedAgenda = agenda.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const sortedAgenda = [...agenda].sort((a, b) => new Date(a.date) - new Date(b.date));
     
     sortedAgenda.slice(0, 5).forEach(item => {
         const agendaItem = document.createElement('div');
@@ -1292,7 +1519,7 @@ function loadPastorAgenda() {
     const tbody = document.querySelector('#agendaTable tbody');
     tbody.innerHTML = '';
     
-    agenda.forEach(item => {
+    sortedAgenda.forEach(item => {
         const row = document.createElement('tr');
         const priorityClass = item.priority || 'medium';
         row.innerHTML = `
@@ -1380,31 +1607,78 @@ function loadPrayerRequests() {
 
 function loadBaptisms() {
     const totalBaptisms = baptisms.length;
-    const thisYearBaptisms = baptisms.filter(b => new Date(b.date).getFullYear() === new Date().getFullYear()).length;
-    const pendingBaptisms = baptisms.filter(b => b.status === 'scheduled').length;
+    const thisYearBaptisms = baptisms.filter(b => {
+        const date = b.baptismDate || b.date;
+        return date && new Date(date).getFullYear() === new Date().getFullYear();
+    }).length;
+    const pendingBaptisms = baptisms.filter(b => b.status === 'scheduled' || b.status === 'pending').length;
     
     document.getElementById('totalBaptisms').textContent = totalBaptisms;
     document.getElementById('thisYearBaptisms').textContent = thisYearBaptisms;
     document.getElementById('pendingBaptisms').textContent = pendingBaptisms;
+    
+    // Mostrar/ocultar botões baseado nas permissões
+    const canManageBaptisms = window.authSystem && window.authSystem.hasPermission('baptisms.edit');
+    const requestBtn = document.getElementById('requestBaptismBtn');
+    const scheduleBtn = document.getElementById('scheduleBaptismBtn');
+    
+    if (requestBtn && scheduleBtn) {
+        if (canManageBaptisms) {
+            // Admin vê apenas o botão de agendar
+            requestBtn.style.display = 'none';
+            scheduleBtn.style.display = 'inline-flex';
+        } else {
+            // Membro vê apenas o botão de solicitar
+            requestBtn.style.display = 'inline-flex';
+            scheduleBtn.style.display = 'none';
+        }
+    }
     
     const tbody = document.querySelector('#baptismsTable tbody');
     tbody.innerHTML = '';
     
     baptisms.forEach(baptism => {
         const row = document.createElement('tr');
+        const baptismDate = baptism.baptismDate || baptism.date;
+        
+        let statusText = 'Agendado';
+        let statusClass = 'scheduled';
+        if (baptism.status === 'completed') {
+            statusText = 'Realizado';
+            statusClass = 'completed';
+        } else if (baptism.status === 'pending') {
+            statusText = 'Pendente';
+            statusClass = 'pending';
+        }
+        
+        // Verificar se o usuário tem permissão para gerenciar batismos
+        const canManageBaptisms = window.authSystem && window.authSystem.hasPermission('baptisms.edit');
+        
         row.innerHTML = `
             <td>${baptism.name}</td>
-            <td>${formatDate(baptism.date)}</td>
-            <td>${baptism.pastor}</td>
-            <td>${baptism.location}</td>
-            <td><span class="status-badge ${baptism.status}">${baptism.status === 'completed' ? 'Realizado' : 'Agendado'}</span></td>
+            <td>${baptismDate ? formatDate(baptismDate) : 'A definir'}</td>
+            <td>${baptism.pastor || 'A definir'}</td>
+            <td>${baptism.location || 'A definir'}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
             <td>
-                <button class="btn btn-success" onclick="completeBaptism(${baptism.id})">
-                    <i class="fas fa-check"></i> Concluir
-                </button>
-                <button class="btn btn-secondary" onclick="editBaptism(${baptism.id})">
-                    <i class="fas fa-edit"></i>
-                </button>
+                ${canManageBaptisms && baptism.status === 'pending' ? `
+                    <button class="btn btn-primary" onclick="scheduleBaptism(${baptism.id})">
+                        <i class="fas fa-calendar"></i> Agendar
+                    </button>
+                ` : ''}
+                ${canManageBaptisms && baptism.status === 'scheduled' ? `
+                    <button class="btn btn-success" onclick="completeBaptism(${baptism.id})">
+                        <i class="fas fa-check"></i> Concluir
+                    </button>
+                ` : ''}
+                ${canManageBaptisms ? `
+                    <button class="btn btn-secondary" onclick="editBaptism(${baptism.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                ` : ''}
+                ${!canManageBaptisms ? `
+                    <span class="text-muted">Aguardando aprovação</span>
+                ` : ''}
             </td>
         `;
         tbody.appendChild(row);
@@ -1459,15 +1733,38 @@ function openMemberModal(memberId = null) {
     const modal = document.getElementById('memberModal');
     const form = document.getElementById('memberForm');
     
+    if (!modal || !form) {
+        console.error('Modal ou formulário de membro não encontrado');
+        return;
+    }
+    
     if (memberId) {
-        const member = members.find(m => m.id === memberId);
+        // Buscar membro no sampleData ou authSystem
+        let member = null;
+        
+        if (typeof memberId === 'string' && memberId.startsWith('auth_')) {
+            // Buscar no authSystem
+            const userId = parseInt(memberId.replace('auth_', ''));
+            if (window.authSystem && window.authSystem.users) {
+                member = window.authSystem.users.find(u => u.id === userId);
+            }
+        } else {
+            // Buscar no sampleData
+            member = sampleData.members?.find(m => m.id === memberId);
+        }
+        
         if (member) {
-            document.getElementById('memberName').value = member.name;
-            document.getElementById('memberEmail').value = member.email;
-            document.getElementById('memberPhone').value = member.phone;
-            document.getElementById('memberAddress').value = member.address;
-            document.getElementById('memberBirthdate').value = member.birthdate;
-            document.getElementById('memberStatus').value = member.status;
+            const nameField = document.getElementById('memberName');
+            const emailField = document.getElementById('memberEmail');
+            const phoneField = document.getElementById('memberPhone');
+            const addressField = document.getElementById('memberAddress');
+            const birthdateField = document.getElementById('memberBirthdate');
+            
+            if (nameField) nameField.value = member.name || '';
+            if (emailField) emailField.value = member.email || '';
+            if (phoneField) phoneField.value = member.phone || '';
+            if (addressField) addressField.value = member.address || '';
+            if (birthdateField) birthdateField.value = member.birthdate || member.birthDate || '';
         }
     } else {
         form.reset();
@@ -1475,10 +1772,12 @@ function openMemberModal(memberId = null) {
     
     // Populate cell options
     const cellSelect = document.getElementById('memberCell');
-    cellSelect.innerHTML = '<option value="">Selecione uma célula</option>';
-    cells.forEach(cell => {
-        cellSelect.innerHTML += `<option value="${cell.name}">${cell.name}</option>`;
-    });
+    if (cellSelect && sampleData.cells) {
+        cellSelect.innerHTML = '<option value="">Selecione uma célula</option>';
+        sampleData.cells.forEach(cell => {
+            cellSelect.innerHTML += `<option value="${cell.name}">${cell.name}</option>`;
+        });
+    }
     
     modal.style.display = 'block';
 }
@@ -1486,6 +1785,11 @@ function openMemberModal(memberId = null) {
 function closeMemberModal() {
     document.getElementById('memberModal').style.display = 'none';
     document.getElementById('memberForm').reset();
+}
+
+function openVisitorModal() {
+    // Usar o mesmo modal de membro para visitantes
+    openMemberModal();
 }
 
 function openMinistryModal(id = null) {
@@ -1843,17 +2147,28 @@ function markAnswered(id) {
     }
 }
 
+function scheduleBaptism(id) {
+    const baptism = baptisms.find(b => b.id === id);
+    if (baptism) {
+        // Abrir modal de batismo para agendar
+        openBaptismModal(id);
+    }
+}
+
 function completeBaptism(id) {
     const baptism = baptisms.find(b => b.id === id);
     if (baptism) {
         baptism.status = 'completed';
         loadBaptisms();
-        showAlert('Batismo marcado como concluído!', 'success');
+        if (window.authSystem) {
+            window.authSystem.showMessage('Batismo marcado como concluído!', 'success');
+        } else {
+            alert('Batismo marcado como concluído!');
+        }
     }
 }
 
-// Placeholder functions for future features
-function openAgendaModal() { alert('Modal de agenda em desenvolvimento'); }
+// Placeholder functions for future features (removidas duplicações)
 function openIncomeModal() { alert('Modal de receita em desenvolvimento'); }
 function openExpenseModal() { alert('Modal de despesa em desenvolvimento'); }
 function editTransaction(id) { alert('Função de edição em desenvolvimento'); }
@@ -2069,5 +2384,454 @@ function loadDevotional() {
     // Initialize Devotional Manager if not already initialized
     if (!window.devotionalManager) {
         initDevotional();
+    }
+}
+
+// Member Management Functions
+function deleteMember(id) {
+    if (!confirm('Tem certeza que deseja excluir este membro?')) {
+        return;
+    }
+    
+    // Verificar se é um ID do sistema de autenticação
+    if (typeof id === 'string' && id.startsWith('auth_')) {
+        const userId = parseInt(id.replace('auth_', ''));
+        if (window.authSystem) {
+            const result = window.authSystem.deleteUser(userId);
+            if (result.success) {
+                window.authSystem.showMessage('Membro excluído com sucesso', 'success');
+                loadActiveMembers();
+                updateDashboard();
+            } else {
+                window.authSystem.showMessage(result.message, 'error');
+            }
+        }
+        return;
+    }
+    
+    // Excluir do sample data
+    const index = sampleData.members.findIndex(m => m.id === id);
+    if (index !== -1) {
+        sampleData.members.splice(index, 1);
+        loadActiveMembers();
+        updateDashboard();
+        alert('Membro excluído com sucesso!');
+    }
+}
+
+function reactivateMember(id) {
+    if (!confirm('Tem certeza que deseja reativar este membro?')) {
+        return;
+    }
+    
+    const member = sampleData.members.find(m => m.id === id);
+    if (member) {
+        member.status = 'active';
+        delete member.inactiveDate;
+        delete member.inactiveReason;
+        loadInactiveMembers();
+        loadActiveMembers();
+        updateDashboard();
+        alert('Membro reativado com sucesso!');
+    }
+}
+
+// Visitor Management Functions
+function editVisitor(id) {
+    console.log('Editando visitante:', id);
+    alert('Função de edição em desenvolvimento. ID: ' + id);
+}
+
+function deleteVisitor(id) {
+    if (!confirm('Tem certeza que deseja excluir este visitante?')) {
+        return;
+    }
+    
+    // Verificar se é um ID do sistema de autenticação
+    if (typeof id === 'string' && id.startsWith('auth_')) {
+        const userId = parseInt(id.replace('auth_', ''));
+        if (window.authSystem) {
+            const result = window.authSystem.deleteUser(userId);
+            if (result.success) {
+                window.authSystem.showMessage('Visitante excluído com sucesso', 'success');
+                loadVisitors();
+            } else {
+                window.authSystem.showMessage(result.message, 'error');
+            }
+        }
+        return;
+    }
+    
+    // Excluir do sample data
+    const index = sampleData.visitors.findIndex(v => v.id === id);
+    if (index !== -1) {
+        sampleData.visitors.splice(index, 1);
+        loadVisitors();
+        alert('Visitante excluído com sucesso!');
+    }
+}
+
+function convertToMember(id) {
+    if (!confirm('Deseja converter este visitante em membro?')) {
+        return;
+    }
+    
+    // Verificar se é um ID do sistema de autenticação
+    if (typeof id === 'string' && id.startsWith('auth_')) {
+        const userId = parseInt(id.replace('auth_', ''));
+        if (window.authSystem) {
+            const result = window.authSystem.updateUser(userId, { 
+                role: 'member',
+                active: true,
+                approved: true
+            });
+            if (result.success) {
+                window.authSystem.showMessage('Visitante convertido em membro com sucesso!', 'success');
+                loadVisitors();
+                loadActiveMembers();
+            } else {
+                window.authSystem.showMessage(result.message, 'error');
+            }
+        }
+        return;
+    }
+    
+    // Converter do sample data
+    const visitorIndex = sampleData.visitors.findIndex(v => v.id === id);
+    if (visitorIndex !== -1) {
+        const visitor = sampleData.visitors[visitorIndex];
+        const newMember = {
+            id: Date.now(),
+            name: visitor.name,
+            email: visitor.email,
+            phone: visitor.phone,
+            birthDate: visitor.birthdate || '',
+            address: '',
+            cell: null,
+            status: 'active',
+            joinedAt: new Date().toISOString()
+        };
+        
+        sampleData.members.push(newMember);
+        sampleData.visitors.splice(visitorIndex, 1);
+        
+        loadVisitors();
+        loadActiveMembers();
+        updateDashboard();
+        alert('Visitante convertido em membro com sucesso!');
+    }
+}
+
+// Profile Management Functions
+function openProfileModal() {
+    if (!window.authSystem || !window.authSystem.currentUser) {
+        alert('Você precisa estar logado para editar o perfil!');
+        return;
+    }
+    
+    const user = window.authSystem.currentUser;
+    const modal = document.getElementById('profileModal');
+    
+    // Preencher formulário com dados atuais
+    document.getElementById('profileName').value = user.name || '';
+    document.getElementById('profileEmail').value = user.email || '';
+    document.getElementById('profilePhone').value = user.phone || '';
+    document.getElementById('profileBirthdate').value = user.birthdate || '';
+    
+    // Limpar campos de senha
+    document.getElementById('profileCurrentPassword').value = '';
+    document.getElementById('profileNewPassword').value = '';
+    document.getElementById('profileConfirmPassword').value = '';
+    
+    modal.style.display = 'block';
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').style.display = 'none';
+    document.getElementById('profileForm').reset();
+}
+
+function handleProfileSubmit(e) {
+    e.preventDefault();
+    
+    if (!window.authSystem || !window.authSystem.currentUser) {
+        alert('Você precisa estar logado!');
+        return;
+    }
+    
+    const currentUser = window.authSystem.currentUser;
+    const updateData = {
+        name: document.getElementById('profileName').value,
+        email: document.getElementById('profileEmail').value,
+        phone: document.getElementById('profilePhone').value,
+        birthdate: document.getElementById('profileBirthdate').value
+    };
+    
+    // Verificar se está alterando senha
+    const currentPassword = document.getElementById('profileCurrentPassword').value;
+    const newPassword = document.getElementById('profileNewPassword').value;
+    const confirmPassword = document.getElementById('profileConfirmPassword').value;
+    
+    if (newPassword || confirmPassword) {
+        // Validar senha atual
+        if (!currentPassword) {
+            window.authSystem.showMessage('Digite sua senha atual para alterar a senha', 'error');
+            return;
+        }
+        
+        if (currentPassword.toLowerCase() !== currentUser.password.toLowerCase()) {
+            window.authSystem.showMessage('Senha atual incorreta', 'error');
+            return;
+        }
+        
+        // Validar nova senha
+        if (newPassword !== confirmPassword) {
+            window.authSystem.showMessage('As senhas não coincidem', 'error');
+            return;
+        }
+        
+        if (newPassword.length < 6) {
+            window.authSystem.showMessage('A nova senha deve ter pelo menos 6 caracteres', 'error');
+            return;
+        }
+        
+        updateData.password = newPassword;
+    }
+    
+    // Atualizar usuário diretamente (bypass de permissões para edição própria)
+    const userIndex = window.authSystem.users.findIndex(u => u.id === currentUser.id);
+    
+    if (userIndex !== -1) {
+        // Atualizar dados do usuário
+        window.authSystem.users[userIndex] = {
+            ...window.authSystem.users[userIndex],
+            ...updateData
+        };
+        
+        // Salvar no localStorage
+        window.authSystem.saveUsers();
+        
+        // Atualizar currentUser
+        window.authSystem.currentUser = {
+            ...window.authSystem.currentUser,
+            ...updateData
+        };
+        
+        // Atualizar interface
+        updateUserInfo();
+        
+        // Log da atividade
+        window.authSystem.logActivity('profile_updated', `${currentUser.name} atualizou seu perfil`);
+        
+        window.authSystem.showMessage('Perfil atualizado com sucesso!', 'success');
+        closeProfileModal();
+        
+        // Recarregar listas se necessário
+        if (currentUser.role === 'member') {
+            loadActiveMembers();
+        } else if (currentUser.role === 'visitor') {
+            loadVisitors();
+        }
+    } else {
+        window.authSystem.showMessage('Erro ao atualizar perfil', 'error');
+    }
+}
+
+// Agenda Management Functions
+function editAgenda(id) {
+    openAgendaModal(id);
+}
+
+function deleteAgenda(id) {
+    if (!confirm('Deseja realmente excluir este compromisso?')) {
+        return;
+    }
+    
+    const index = agenda.findIndex(a => a.id === id);
+    if (index !== -1) {
+        agenda.splice(index, 1);
+        loadPastorAgenda();
+        if (window.authSystem) {
+            window.authSystem.showMessage('Compromisso excluído com sucesso!', 'success');
+        } else {
+            alert('Compromisso excluído com sucesso!');
+        }
+    }
+}
+
+// Cell Participation Request Functions
+function requestCellParticipation() {
+    if (!window.authSystem || !window.authSystem.currentUser) {
+        alert('Você precisa estar logado para solicitar participação em célula!');
+        return;
+    }
+    
+    // Mostrar modal ou lista de células disponíveis
+    const cellsList = cells.map((cell, index) => 
+        `${index + 1}. ${cell.name} - ${cell.leader} (${cell.dayOfWeek || 'Dia não definido'} às ${cell.time || 'Horário não definido'})`
+    ).join('\n');
+    
+    const cellNumber = prompt(`Escolha uma célula para participar:\n\n${cellsList}\n\nDigite o número da célula:`);
+    
+    if (cellNumber) {
+        const cellIndex = parseInt(cellNumber) - 1;
+        if (cellIndex >= 0 && cellIndex < cells.length) {
+            requestJoinCell(cells[cellIndex].id);
+        } else {
+            alert('Número de célula inválido!');
+        }
+    }
+}
+
+function requestJoinCell(cellId) {
+    if (!window.authSystem || !window.authSystem.currentUser) {
+        alert('Você precisa estar logado para solicitar participação!');
+        return;
+    }
+    
+    const currentUser = window.authSystem.currentUser;
+    const cell = cells.find(c => c.id === cellId);
+    
+    if (!cell) {
+        alert('Célula não encontrada!');
+        return;
+    }
+    
+    // Verificar se já está em uma célula
+    if (currentUser.cell) {
+        if (!confirm(`Você já participa da célula "${currentUser.cell}". Deseja solicitar mudança para "${cell.name}"?`)) {
+            return;
+        }
+    } else {
+        if (!confirm(`Deseja solicitar participação na célula "${cell.name}"?`)) {
+            return;
+        }
+    }
+    
+    // Criar solicitação (em um sistema real, isso seria salvo no banco)
+    const request = {
+        id: Date.now(),
+        userId: currentUser.id,
+        userName: currentUser.name,
+        userEmail: currentUser.email,
+        cellId: cell.id,
+        cellName: cell.name,
+        requestDate: new Date().toISOString(),
+        status: 'pending'
+    };
+    
+    // Salvar solicitação (simulado)
+    if (!window.cellRequests) {
+        window.cellRequests = [];
+    }
+    window.cellRequests.push(request);
+    
+    window.authSystem.showMessage(`Solicitação de participação na célula "${cell.name}" enviada com sucesso! O líder será notificado.`, 'success');
+}
+
+// Request My Baptism (for current user)
+function requestMyBaptism() {
+    if (!window.authSystem || !window.authSystem.currentUser) {
+        alert('Você precisa estar logado para solicitar batismo!');
+        return;
+    }
+    
+    const currentUser = window.authSystem.currentUser;
+    
+    // Verificar se já existe uma solicitação pendente
+    const existingRequest = baptisms.find(b => 
+        b.email === currentUser.email && 
+        (b.status === 'pending' || b.status === 'scheduled')
+    );
+    
+    if (existingRequest) {
+        alert('Você já possui uma solicitação de batismo em andamento!');
+        return;
+    }
+    
+    if (!confirm('Deseja solicitar seu batismo?')) {
+        return;
+    }
+    
+    // Criar solicitação de batismo
+    const baptismRequest = {
+        id: Date.now(),
+        memberId: currentUser.id,
+        name: currentUser.name,
+        email: currentUser.email,
+        requestDate: new Date().toISOString(),
+        baptismDate: null,
+        pastor: 'A definir',
+        location: 'A definir',
+        status: 'pending'
+    };
+    
+    baptisms.push(baptismRequest);
+    
+    window.authSystem.showMessage('Solicitação de batismo enviada com sucesso!', 'success');
+    loadBaptisms();
+}
+
+// Baptism Request Function
+function requestBaptism(id) {
+    if (!confirm('Deseja solicitar batismo para este membro?')) {
+        return;
+    }
+    
+    let memberName = '';
+    let memberEmail = '';
+    
+    // Buscar informações do membro
+    if (typeof id === 'string' && id.startsWith('auth_')) {
+        const userId = parseInt(id.replace('auth_', ''));
+        if (window.authSystem && window.authSystem.users) {
+            const user = window.authSystem.users.find(u => u.id === userId);
+            if (user) {
+                memberName = user.name;
+                memberEmail = user.email;
+            }
+        }
+    } else {
+        const member = sampleData.members?.find(m => m.id === id);
+        if (member) {
+            memberName = member.name;
+            memberEmail = member.email;
+        }
+    }
+    
+    if (!memberName) {
+        alert('Membro não encontrado!');
+        return;
+    }
+    
+    // Criar solicitação de batismo
+    const baptismRequest = {
+        id: Date.now(),
+        memberId: id,
+        name: memberName,
+        email: memberEmail,
+        requestDate: new Date().toISOString(),
+        baptismDate: null,
+        pastor: 'A definir',
+        location: 'A definir',
+        status: 'pending'
+    };
+    
+    // Adicionar à lista de batismos
+    if (!baptisms) {
+        baptisms = [];
+    }
+    baptisms.push(baptismRequest);
+    
+    // Mostrar mensagem de sucesso
+    if (window.authSystem) {
+        window.authSystem.showMessage('Solicitação de batismo enviada com sucesso!', 'success');
+    } else {
+        alert('Solicitação de batismo enviada com sucesso!');
+    }
+    
+    // Atualizar a seção de batismos se estiver visível
+    if (document.getElementById('baptisms').classList.contains('active')) {
+        loadBaptisms();
     }
 }

@@ -11,11 +11,10 @@
     <link rel="stylesheet" href="branch-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="branches-data.js"></script>
-    <script src="branch-isolation.js"></script>
+    <script src="branches.js"></script>
+    <script src="multi-branch-auth.js"></script>
     <script src="sample-data.js"></script>
     <script src="auth-system.js"></script>
-    <script src="branch-auth.js"></script>
     <script src="user-management.js"></script>
     <script src="bible-data.js"></script>
     <script src="bible-api-service.js"></script>
@@ -23,8 +22,6 @@
     <script src="devotional-data.js"></script>
     <script src="reading-plan.js"></script>
     <script src="devotional.js"></script>
-    <script src="branch-ui.js"></script>
-    <script src="branch-management.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
@@ -36,15 +33,6 @@
                 <h2>Sistema de Gestão da Igreja</h2>
             </div>
             <form id="loginForm">
-                <div class="form-group">
-                    <label for="loginBranch">
-                        <i class="fas fa-building"></i> Filial
-                    </label>
-                    <select id="loginBranch" required>
-                        <option value="">Selecione sua filial...</option>
-                    </select>
-                    <small class="form-hint">Escolha a filial que você deseja acessar</small>
-                </div>
                 <div class="form-group">
                     <label for="username">Usuário</label>
                     <input type="text" id="username" required>
@@ -73,15 +61,6 @@
                 <p>Registre-se para acompanhar as atividades da igreja</p>
             </div>
             <form id="registerForm">
-                <div class="form-group">
-                    <label for="registerBranch">
-                        <i class="fas fa-building"></i> Filial *
-                    </label>
-                    <select id="registerBranch" required>
-                        <option value="">Selecione sua filial...</option>
-                    </select>
-                    <small class="form-hint">Escolha a filial que você deseja se cadastrar</small>
-                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="registerName">Nome Completo *</label>
@@ -116,6 +95,10 @@
                         <label for="registerPasswordConfirm">Confirmar Senha *</label>
                         <input type="password" id="registerPasswordConfirm" required>
                     </div>
+                </div>
+                <div class="form-group branch-select-group">
+                    <label for="registerBranchSelect">Filial de Interesse *</label>
+                    <select id="registerBranchSelect" required></select>
                 </div>
                 <div class="form-group">
                     <label for="registerHowFound">Como conheceu nossa igreja?</label>
@@ -162,6 +145,7 @@
             <div class="sidebar-header">
                 <i class="fas fa-church"></i>
                 <h3>Igreja</h3>
+                <p id="userBranchInfo" class="branch-info" style="margin: 5px 0 0 0; font-size: 12px; color: #95a5a6;">Carregando...</p>
             </div>
             <ul class="sidebar-menu">
                 <li><a href="#" data-section="dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -184,7 +168,6 @@
                 <li><a href="#" data-section="baptisms"><i class="fas fa-water"></i> Batismos</a></li>
                 <li><a href="#" data-section="donations"><i class="fas fa-heart"></i> Doações</a></li>
                 <li><a href="#" data-section="bible"><i class="fas fa-book-bible"></i> Bíblia Sagrada</a></li>
-                <li><a href="#" data-section="branches-management"><i class="fas fa-building"></i> Filiais</a></li>
             </ul>
             <div class="sidebar-footer">
                 <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</button>
@@ -197,6 +180,7 @@
                 <h1 id="pageTitle">Dashboard</h1>
                 <div class="user-info">
                     <span id="currentUser">Admin</span>
+                    <i class="fas fa-user-edit" onclick="openProfileModal()" style="cursor: pointer; margin: 0 10px; color: #3498db;" title="Editar Perfil"></i>
                     <i class="fas fa-user-circle"></i>
                 </div>
             </header>
@@ -370,6 +354,7 @@
                                     <th>Nome</th>
                                     <th>Email</th>
                                     <th>Telefone</th>
+                                    <th>Filial</th>
                                     <th>Data da Visita</th>
                                     <th>Como Conheceu</th>
                                     <th>Ações</th>
@@ -634,9 +619,14 @@
                 <section id="cells" class="content-section">
                     <div class="section-header">
                         <h2>Células</h2>
-                        <button class="btn btn-primary" onclick="openCellModal()">
-                            <i class="fas fa-plus"></i> Adicionar Célula
-                        </button>
+                        <div>
+                            <button class="btn btn-success" id="requestCellBtn" onclick="requestCellParticipation()" style="display: none;">
+                                <i class="fas fa-user-plus"></i> Solicitar Participação
+                            </button>
+                            <button class="btn btn-primary" id="addCellBtn" onclick="openCellModal()" style="display: none;">
+                                <i class="fas fa-plus"></i> Adicionar Célula
+                            </button>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table id="cellsTable" class="data-table">
@@ -677,10 +667,9 @@
                     </div>
                     <div class="agenda-container">
                         <div class="calendar-view" id="pastorCalendar">
-                            <h3>Calendário</h3>
-                            <div class="calendar-placeholder">
-                                <i class="fas fa-calendar-alt" style="font-size: 48px; color: #bdc3c7; margin-bottom: 10px;"></i>
-                                <p>Visualização do calendário em desenvolvimento</p>
+                            <h3>📅 Calendário do Mês</h3>
+                            <div id="simpleCalendar" style="padding: 10px;">
+                                <!-- Calendário será gerado aqui -->
                             </div>
                         </div>
                         <div class="agenda-list" id="agendaList"></div>
@@ -767,9 +756,14 @@
                 <section id="baptisms" class="content-section">
                     <div class="section-header">
                         <h2>Batismos</h2>
-                        <button class="btn btn-primary" onclick="openBaptismModal()">
-                            <i class="fas fa-plus"></i> Agendar Batismo
-                        </button>
+                        <div>
+                            <button class="btn btn-success" id="requestBaptismBtn" onclick="requestMyBaptism()" style="display: none;">
+                                <i class="fas fa-water"></i> Solicitar Meu Batismo
+                            </button>
+                            <button class="btn btn-primary" id="scheduleBaptismBtn" onclick="openBaptismModal()" style="display: none;">
+                                <i class="fas fa-plus"></i> Agendar Batismo
+                            </button>
+                        </div>
                     </div>
                     <div class="baptism-stats">
                         <div class="stat-item">
@@ -934,11 +928,6 @@
                             </div>
                         </div>
                     </div>
-                </section>
-
-                <!-- Branches Management Section -->
-                <section id="branches-management" class="content-section">
-                    <!-- Conteúdo será renderizado dinamicamente pelo branch-management.js -->
                 </section>
             </div>
         </main>
@@ -1403,6 +1392,49 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Perfil</h3>
+                <span class="close" onclick="closeProfileModal()">&times;</span>
+            </div>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="profileName">Nome Completo</label>
+                    <input type="text" id="profileName" required>
+                </div>
+                <div class="form-group">
+                    <label for="profileEmail">Email</label>
+                    <input type="email" id="profileEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="profilePhone">Telefone</label>
+                    <input type="tel" id="profilePhone">
+                </div>
+                <div class="form-group">
+                    <label for="profileBirthdate">Data de Nascimento</label>
+                    <input type="date" id="profileBirthdate">
+                </div>
+                <div class="form-group">
+                    <label for="profileCurrentPassword">Senha Atual (deixe em branco para não alterar)</label>
+                    <input type="password" id="profileCurrentPassword">
+                </div>
+                <div class="form-group">
+                    <label for="profileNewPassword">Nova Senha</label>
+                    <input type="password" id="profileNewPassword">
+                </div>
+                <div class="form-group">
+                    <label for="profileConfirmPassword">Confirmar Nova Senha</label>
+                    <input type="password" id="profileConfirmPassword">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>

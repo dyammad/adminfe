@@ -412,6 +412,7 @@ class AuthSystem {
             phone: userData.phone || '',
             birthdate: userData.birthdate || '',
             howFound: userData.howFound || '',
+            branchId: userData.branchId || null,
             // Status de aprovação para auto-cadastro
             approved: userData.selfRegister ? false : true,
             approvedBy: userData.selfRegister ? null : this.currentUser?.username || 'system',

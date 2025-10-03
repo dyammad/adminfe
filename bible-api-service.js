@@ -135,7 +135,8 @@ class BibleAPIService {
             clearTimeout(timeoutId);
             
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                console.log(`⚠️ API secundária indisponível (status: ${response.status}), usando dados locais`);
+                return null;
             }
             
             const data = await response.json();
@@ -150,8 +151,7 @@ class BibleAPIService {
             
             return null;
         } catch (error) {
-            console.error('❌ Erro na API secundária:', error.message);
-            console.log('⚠️ Todas as APIs falharam, usando dados de exemplo');
+            console.log('⚠️ API secundária indisponível, usando dados locais');
             return null;
         }
     }

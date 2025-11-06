@@ -6,11 +6,17 @@
     <title>Sistema de Gestão da Igreja</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="auth-styles.css">
+    <link rel="stylesheet" href="church-styles.css">
+    <link rel="stylesheet" href="treasury-report-styles.css">
     <link rel="stylesheet" href="bible-styles.css">
     <link rel="stylesheet" href="devotional-styles.css">
     <link rel="stylesheet" href="branch-styles.css">
+    <link rel="stylesheet" href="missions-styles.css">
+    <link rel="stylesheet" href="dre-styles.css">
+    <link rel="stylesheet" href="exam-report-styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=bBcHkL6RAcc1Qu7JEM2zoiQVNVmSTYpv-AKG4G17dKO5AKbJ38Eeur1cDc8E4HK6JfeKEe-GbaLvCw7gV-YmHadtzOxSo1dUuqc3Zhr7OBzHYtewcjNczSVyB00DXSxj7gGDCK7OlU1wEhV4Xwq3MK9bP-qpyNooPTWJjEPIHekRclJ9xQquc2kW-arOLrO6_qvFFzMKcBD1NReKgemgecYKd2X3upQxBxyFJHAP1RPxKsMJNuxifftpvomHLwHPJlt7UFJKILkOP00WRo8_rTQiF16a5LrfgUp7s36hLZu9Vz_b1FyysUA6JhDJVr07vWxiVFBUzqykIlpaw6ofcTRdxZtd_Wixvim1cr5awcrdo_P6Cm_hVZzXXwSXZwiBn61H5dUBCtLitmyFG15ItJ5_Hcot_VPYMBDIgl-5NYO3JxhZ-Bd7EsaSD7Lg1iMUCxAW19T9Aens0I4y5JUR6gXr-PiXS1Nx9PdStV_26qbXrw-ozUnDV9ek5S7w5CEpbxRvBI8HnGq4hD0RVkOJY62VzuJySXoZ15b_UXC8KhyzTIyOrPzpLlprcsSntLXo3bRd45CyFRe6KOJ9y1vjfRbtTRyCwWOwDO9TSkhdL2YjXrN7hUulO-DtweawCNAsk5tqkGDGiyigxsdRCLB6y2EdZlxGNGRc4W5mNGGZwtqzP4CaR5czXE5LdJbl3vONN1fwAc_1NNAN3D8mWmxq64DJ_wvDBQwkBE0Zz2Ui2acd0wqdJ6o_QzLVQJ6V8V_Vp8yGri_092Ilkn14LDvE3T97h9OMG40TMnq4eBrfwcE" charset="UTF-8"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="branches.js"></script>
     <script src="multi-branch-auth.js"></script>
     <script src="sample-data.js"></script>
@@ -22,6 +28,7 @@
     <script src="devotional-data.js"></script>
     <script src="reading-plan.js"></script>
     <script src="devotional.js"></script>
+    <script src="church-management.js"></script>
     <script src="script.js"></script>
 </head>
 <body>
@@ -149,6 +156,7 @@
             </div>
             <ul class="sidebar-menu">
                 <li><a href="#" data-section="dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li id="adminChurchMenu" style="display: none;"><a href="#" data-section="church-management"><i class="fas fa-church"></i> Cadastrar Igrejas</a></li>
                 <li class="menu-section">
                     <span>Membros</span>
                     <ul>
@@ -163,7 +171,16 @@
                 <li><a href="#" data-section="cells"><i class="fas fa-home"></i> Células</a></li>
                 <li><a href="#" data-section="events"><i class="fas fa-calendar"></i> Eventos</a></li>
                 <li><a href="#" data-section="pastor-agenda"><i class="fas fa-calendar-check"></i> Agenda Pastor</a></li>
-                <li><a href="#" data-section="treasury"><i class="fas fa-coins"></i> Tesouraria</a></li>
+                <li class="menu-section">
+                    <span>Tesouraria</span>
+                    <ul>
+                        <li><a href="#" data-section="treasury"><i class="fas fa-coins"></i> Movimentações</a></li>
+                        <li><a href="#" data-section="treasury-report"><i class="fas fa-file-alt"></i> Relatório</a></li>
+                        <li><a href="#" data-section="missions-report"><i class="fas fa-globe-americas"></i> Campanhas de Missões</a></li>
+                        <li><a href="#" data-section="dre-report"><i class="fas fa-chart-line"></i> DRE Anual</a></li>
+                        <li><a href="#" data-section="exam-report"><i class="fas fa-file-signature"></i> Exame de Contas</a></li>
+                    </ul>
+                </li>
                 <li><a href="#" data-section="prayer-requests"><i class="fas fa-praying-hands"></i> Pedidos de Oração</a></li>
                 <li><a href="#" data-section="baptisms"><i class="fas fa-water"></i> Batismos</a></li>
                 <li><a href="#" data-section="donations"><i class="fas fa-heart"></i> Doações</a></li>
@@ -246,6 +263,196 @@
                         <div class="chart-container">
                             <h3>Ofertas por Mês</h3>
                             <canvas id="offeringsChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Church Management Section (Admin Only) -->
+                <section id="church-management" class="content-section">
+                    <div class="section-header">
+                        <h2>Cadastro de Novas Igrejas</h2>
+                    </div>
+
+                    <div class="church-form-container">
+                        <form id="churchForm" class="church-registration-form">
+                            <!-- Endereço -->
+                            <fieldset class="form-fieldset">
+                                <legend>Endereço</legend>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="churchPrincipal">
+                                            Principal?
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Tipo: <span class="required">*</span></label>
+                                        <div class="radio-group">
+                                            <label><input type="radio" name="churchType" value="Residencial" checked> Residencial</label>
+                                            <label><input type="radio" name="churchType" value="Comercial"> Comercial</label>
+                                            <label><input type="radio" name="churchType" value="Outro"> Outro</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half-width">
+                                        <label>País: <span class="required">*</span></label>
+                                        <select id="churchCountry" required>
+                                            <option value="BRASIL" selected>BRASIL</option>
+                                            <option value="ARGENTINA">ARGENTINA</option>
+                                            <option value="PARAGUAI">PARAGUAI</option>
+                                            <option value="URUGUAI">URUGUAI</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group half-width">
+                                        <label>CEP: <span class="required">*</span></label>
+                                        <input type="text" id="churchCEP" placeholder="00000-000" maxlength="9" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half-width">
+                                        <label>Estado: <span class="required">*</span></label>
+                                        <select id="churchState" required>
+                                            <option value="">Selecione</option>
+                                            <option value="MG">MG</option>
+                                            <option value="SP">SP</option>
+                                            <option value="RJ">RJ</option>
+                                            <option value="ES">ES</option>
+                                            <option value="BA">BA</option>
+                                            <option value="PR">PR</option>
+                                            <option value="SC">SC</option>
+                                            <option value="RS">RS</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group half-width">
+                                        <label>Município: <span class="required">*</span></label>
+                                        <input type="text" id="churchCity" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half-width">
+                                        <label>Bairro: <span class="required">*</span></label>
+                                        <input type="text" id="churchNeighborhood" required>
+                                    </div>
+                                    <div class="form-group half-width">
+                                        <label>Tipo: <span class="required">*</span></label>
+                                        <select id="churchStreetType" required>
+                                            <option value="">Selecione</option>
+                                            <option value="Rua">Rua</option>
+                                            <option value="Avenida">Avenida</option>
+                                            <option value="Travessa">Travessa</option>
+                                            <option value="Alameda">Alameda</option>
+                                            <option value="Praça">Praça</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half-width">
+                                        <label>Logradouro: <span class="required">*</span></label>
+                                        <input type="text" id="churchStreet" required>
+                                    </div>
+                                    <div class="form-group quarter-width">
+                                        <label>Número: <span class="required">*</span></label>
+                                        <input type="text" id="churchNumber" required>
+                                    </div>
+                                    <div class="form-group quarter-width">
+                                        <label>Complemento:</label>
+                                        <input type="text" id="churchComplement">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Contatos -->
+                            <fieldset class="form-fieldset">
+                                <legend>Contatos</legend>
+                                
+                                <div class="form-row">
+                                    <div class="form-group half-width">
+                                        <label>Telefone 1:</label>
+                                        <input type="tel" id="churchPhone1" placeholder="(00) 0000-0000">
+                                    </div>
+                                    <div class="form-group half-width">
+                                        <label>Telefone 2:</label>
+                                        <input type="tel" id="churchPhone2" placeholder="(00) 0000-0000">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>E-mail:</label>
+                                        <input type="email" id="churchEmail" placeholder="igreja@exemplo.com">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Informações Adicionais -->
+                            <fieldset class="form-fieldset">
+                                <legend>Informações da Igreja</legend>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nome da Igreja: <span class="required">*</span></label>
+                                        <input type="text" id="churchName" placeholder="Ex: Igreja Batista de Linhares" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group half-width">
+                                        <label>CNPJ:</label>
+                                        <input type="text" id="churchCNPJ" placeholder="00.000.000/0000-00" maxlength="18">
+                                    </div>
+                                    <div class="form-group half-width">
+                                        <label>Data de Fundação:</label>
+                                        <input type="date" id="churchFoundationDate">
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Atenção -->
+                            <div class="form-alert">
+                                <strong>ATENÇÃO!</strong><br>
+                                A indicação do CEP (Código de Endereçamento Postal) é imprescindível ao cadastro completo dos dados do processo e garante uma tramitação rápida e segura deste.
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Salvar
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="clearChurchForm()">
+                                    <i class="fas fa-times"></i> Limpar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Lista de Igrejas Cadastradas -->
+                        <div class="churches-list">
+                            <h3>Igrejas Cadastradas</h3>
+                            <div class="table-container">
+                                <table class="data-table" id="churchesTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Cidade/Estado</th>
+                                            <th>CNPJ</th>
+                                            <th>Telefone</th>
+                                            <th>E-mail</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Será preenchido dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -733,6 +940,488 @@
                             </thead>
                             <tbody></tbody>
                         </table>
+                    </div>
+                </section>
+
+                <!-- Treasury Report Section -->
+                <section id="treasury-report" class="content-section">
+                    <div class="treasury-report-container">
+                        <!-- Cabeçalho do Relatório -->
+                        <div class="treasury-report-header">
+                            <div class="report-title-section">
+                                <h2>LANÇAMENTO DE CONTAS</h2>
+                                <div class="report-month-selector">
+                                    <select id="treasuryMonthFilter" onchange="loadTreasuryReport(this.value)">
+                                        <option value="0">JANEIRO - 2025</option>
+                                        <option value="1">FEVEREIRO - 2025</option>
+                                        <option value="2">MARÇO - 2025</option>
+                                        <option value="3">ABRIL - 2025</option>
+                                        <option value="4" selected>MAIO - 2025</option>
+                                        <option value="5">JUNHO - 2025</option>
+                                        <option value="6">JULHO - 2025</option>
+                                        <option value="7">AGOSTO - 2025</option>
+                                        <option value="8">SETEMBRO - 2025</option>
+                                        <option value="9">OUTUBRO - 2025</option>
+                                        <option value="10">NOVEMBRO - 2025</option>
+                                        <option value="11">DEZEMBRO - 2025</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="report-summary-box">
+                                <div class="summary-row">
+                                    <span class="summary-label">Saldo mês anterior</span>
+                                    <span class="summary-value" id="reportPrevBalance">0,00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Total de entradas</span>
+                                    <span class="summary-value" id="reportTotalIncome">0,00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span class="summary-label">Total de saídas</span>
+                                    <span class="summary-value" id="reportTotalExpense">0,00</span>
+                                </div>
+                                <div class="summary-row summary-final">
+                                    <span class="summary-label">Saldo para próximo mês</span>
+                                    <span class="summary-value" id="reportNextBalance">0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabela de Lançamentos -->
+                        <div class="treasury-table-wrapper">
+                            <table id="treasuryReportTable" class="treasury-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-n">N</th>
+                                        <th class="col-data">Data Conta</th>
+                                        <th class="col-conta">Conta</th>
+                                        <th class="col-plano">Plano Contas</th>
+                                        <th class="col-descricao">Descrição</th>
+                                        <th class="col-documento">Documento</th>
+                                        <th class="col-entrada">Entrada</th>
+                                        <th class="col-saida">Saída</th>
+                                        <th class="col-saldo">Saldo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Linha de exemplo para teste -->
+                                    <tr style="display: none;" class="test-row">
+                                        <td class="text-center">1</td>
+                                        <td class="text-center">01/11/2025</td>
+                                        <td>Sicoob</td>
+                                        <td>Dízimos</td>
+                                        <td>Dízimos - Culto Domingo</td>
+                                        <td>Nota</td>
+                                        <td class="text-right">2.500,00</td>
+                                        <td class="text-right"></td>
+                                        <td class="text-right"><strong>7.500,00</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Missions Report Section -->
+                <section id="missions-report" class="content-section">
+                    <div class="section-header">
+                        <h2>Relatório de Campanhas de Missões</h2>
+                        <div>
+                            <select id="missionsYearFilter" class="btn btn-secondary" onchange="loadMissionsReport()">
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campanhas Grid -->
+                    <div class="missions-campaigns-grid">
+                        <!-- Missões Estaduais -->
+                        <div class="campaign-card">
+                            <div class="campaign-header">
+                                <h3>CAMPANHA</h3>
+                                <span class="campaign-title">MISSÕES ESTADUAIS</span>
+                            </div>
+                            <div class="campaign-values">
+                                <div class="campaign-row">
+                                    <span class="label">ALVO</span>
+                                    <span class="value" id="estaduaisAlvo">R$ 0,00</span>
+                                </div>
+                                <div class="campaign-row">
+                                    <span class="label">ALCANÇADO</span>
+                                    <span class="value achieved" id="estaduaisAlcancado">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Missões Nacionais -->
+                        <div class="campaign-card">
+                            <div class="campaign-header">
+                                <h3>CAMPANHA</h3>
+                                <span class="campaign-title">MISSÕES NACIONAIS</span>
+                            </div>
+                            <div class="campaign-values">
+                                <div class="campaign-row">
+                                    <span class="label">ALVO</span>
+                                    <span class="value" id="nacionaisAlvo">R$ 0,00</span>
+                                </div>
+                                <div class="campaign-row">
+                                    <span class="label">ALCANÇADO</span>
+                                    <span class="value achieved" id="nacionaisAlcancado">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Missões Mundiais -->
+                        <div class="campaign-card">
+                            <div class="campaign-header">
+                                <h3>CAMPANHA</h3>
+                                <span class="campaign-title">MISSÕES MUNDIAIS</span>
+                            </div>
+                            <div class="campaign-values">
+                                <div class="campaign-row">
+                                    <span class="label">ALVO</span>
+                                    <span class="value" id="mundiaisAlvo">R$ 0,00</span>
+                                </div>
+                                <div class="campaign-row">
+                                    <span class="label">ALCANÇADO</span>
+                                    <span class="value achieved" id="mundiaisAlcancado">R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Totais -->
+                    <div class="missions-totals">
+                        <div class="total-row">
+                            <span class="total-label">TOTAL DAS CAMPANHAS DE MISSÕES</span>
+                            <span class="total-value" id="totalCampanhas">R$ 0,00</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">ALVOS DAS CAMPANHAS DE MISSÕES</span>
+                            <span class="total-value" id="totalAlvos">R$ 0,00</span>
+                            <span class="total-label-right">SALDO</span>
+                            <span class="total-value balance" id="saldoMissoes">R$ 0,00</span>
+                        </div>
+                        <div class="total-row dark">
+                            <span class="total-label">VALORES ENVIADOS / APLICADOS</span>
+                            <span class="total-value" id="totalEnviados">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Detalhamento por Tipo -->
+                    <div class="missions-details-grid">
+                        <!-- Missões Estaduais Detalhes -->
+                        <div class="mission-detail-card">
+                            <h3>MISSÕES ESTADUAIS <span id="estaduaisYear">2025</span></h3>
+                            <div class="detail-total">
+                                <span>Total:</span>
+                                <span id="estaduaisTotal">R$ 0,00</span>
+                            </div>
+                            <div class="detail-list" id="estaduaisDetails">
+                                <div class="detail-item">
+                                    <span>Adultos</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Adolescentes</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Ministério Infantil</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Missões Nacionais Detalhes -->
+                        <div class="mission-detail-card">
+                            <h3>MISSÕES NACIONAIS <span id="nacionaisYear">2025</span></h3>
+                            <div class="detail-total">
+                                <span>Total:</span>
+                                <span id="nacionaisTotal">R$ 0,00</span>
+                            </div>
+                            <div class="detail-list" id="nacionaisDetails">
+                                <div class="detail-item">
+                                    <span>Setembro</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Outubro</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Missões Mundiais Detalhes -->
+                        <div class="mission-detail-card">
+                            <h3>MISSÕES MUNDIAIS <span id="mundiaisYear">2025</span></h3>
+                            <div class="detail-total">
+                                <span>Total:</span>
+                                <span id="mundiaisTotal">R$ 0,00</span>
+                            </div>
+                            <div class="detail-list" id="mundiaisDetails">
+                                <div class="detail-item">
+                                    <span>Adultos</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Adolescentes</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span>Ministério Infantil</span>
+                                    <span>R$ 0,00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DRE Annual Report Section -->
+                <section id="dre-report" class="content-section">
+                    <div class="section-header">
+                        <h2>Relatório Anual de Contas (DRE)</h2>
+                        <div>
+                            <select id="dreYearFilter" class="btn btn-secondary" onchange="loadDREReport()">
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="dre-container">
+                        <div class="dre-table-wrapper">
+                            <table class="dre-table">
+                                <thead>
+                                    <tr>
+                                        <th class="dre-category-col">Total</th>
+                                        <th class="dre-month-col">Janeiro</th>
+                                        <th class="dre-month-col">Fevereiro</th>
+                                        <th class="dre-month-col">Março</th>
+                                        <th class="dre-month-col">Abril</th>
+                                        <th class="dre-month-col">Maio</th>
+                                        <th class="dre-month-col">Junho</th>
+                                        <th class="dre-month-col">Julho</th>
+                                        <th class="dre-month-col">Agosto</th>
+                                        <th class="dre-month-col">Setembro</th>
+                                        <th class="dre-month-col">Outubro</th>
+                                        <th class="dre-month-col">Novembro</th>
+                                        <th class="dre-month-col">Dezembro</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dreTableBody">
+                                    <!-- Será preenchido dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Lançamento de Contas Section -->
+                    <div class="dre-lancamentos">
+                        <h3>Lançamento de Contas</h3>
+                        <div class="lancamento-filters">
+                            <select id="lancamentoMes" class="form-control">
+                                <option value="">Selecione o mês</option>
+                                <option value="1">Janeiro</option>
+                                <option value="2">Fevereiro</option>
+                                <option value="3">Março</option>
+                                <option value="4">Abril</option>
+                                <option value="5">Maio</option>
+                                <option value="6">Junho</option>
+                                <option value="7">Julho</option>
+                                <option value="8">Agosto</option>
+                                <option value="9">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table" id="lancamentosTable">
+                                <thead>
+                                    <tr>
+                                        <th>Nº</th>
+                                        <th>Categoria</th>
+                                        <th>Descrição</th>
+                                        <th>Tipo</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Será preenchido dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Exam Report Section -->
+                <section id="exam-report" class="content-section">
+                    <div class="section-header">
+                        <h2>Relatório de Exame de Contas</h2>
+                        <div>
+                            <button class="btn btn-info" onclick="showCoverPage()">
+                                <i class="fas fa-book"></i> Visualizar Capa
+                            </button>
+                            <button class="btn btn-primary" onclick="printExamReport()">
+                                <i class="fas fa-print"></i> Imprimir
+                            </button>
+                            <button class="btn btn-success" onclick="exportExamReportPDF()">
+                                <i class="fas fa-file-pdf"></i> Exportar PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Cover Page (Hidden by default) -->
+                    <div class="cover-page-container" id="coverPageContainer" style="display: none;">
+                        <div class="cover-page">
+                            <div class="cover-content">
+                                <div class="cover-church-name">
+                                    <input type="text" id="coverChurchName" class="cover-input" value="Igreja Batista" placeholder="Nome da Igreja">
+                                </div>
+
+                                <div class="cover-title">
+                                    <h1>Relatório de Apresentação</h1>
+                                    <h1>de Contas Financeiras</h1>
+                                </div>
+
+                                <div class="cover-period">
+                                    <select id="coverMonth" class="cover-select">
+                                        <option value="Janeiro">Janeiro</option>
+                                        <option value="Fevereiro">Fevereiro</option>
+                                        <option value="Março">Março</option>
+                                        <option value="Abril">Abril</option>
+                                        <option value="Maio">Maio</option>
+                                        <option value="Junho">Junho</option>
+                                        <option value="Julho">Julho</option>
+                                        <option value="Agosto">Agosto</option>
+                                        <option value="Setembro">Setembro</option>
+                                        <option value="Outubro" selected>Outubro</option>
+                                        <option value="Novembro">Novembro</option>
+                                        <option value="Dezembro">Dezembro</option>
+                                    </select>
+                                    <span> - </span>
+                                    <select id="coverYear" class="cover-select">
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+
+                                <div class="cover-footer">
+                                    <div class="cover-footer-line"></div>
+                                    <div class="cover-church-info">
+                                        <p><span id="coverChurchNameFooter">Igreja Batista</span></p>
+                                        <p>CNPJ: <input type="text" id="coverCNPJ" class="cover-input-small" placeholder="00.000.000/0000-00"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cover-actions">
+                            <button class="btn btn-secondary" onclick="hideCoverPage()">
+                                <i class="fas fa-arrow-left"></i> Voltar
+                            </button>
+                            <button class="btn btn-primary" onclick="printCoverPage()">
+                                <i class="fas fa-print"></i> Imprimir Capa
+                            </button>
+                            <button class="btn btn-success" onclick="exportCoverPagePDF()">
+                                <i class="fas fa-file-pdf"></i> Exportar Capa PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="exam-report-container">
+                        <div class="exam-report-document">
+                            <!-- Cabeçalho -->
+                            <div class="exam-header">
+                                <h1>Relatório de Exame de Contas</h1>
+                            </div>
+
+                            <!-- Informações do Período -->
+                            <div class="exam-period">
+                                <div class="period-selector">
+                                    <label>Mês de Referência:</label>
+                                    <select id="examMonth" onchange="updateExamReport()">
+                                        <option value="1">Janeiro</option>
+                                        <option value="2">Fevereiro</option>
+                                        <option value="3">Março</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Maio</option>
+                                        <option value="6">Junho</option>
+                                        <option value="7">Julho</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Setembro</option>
+                                        <option value="10" selected>Outubro</option>
+                                        <option value="11">Novembro</option>
+                                        <option value="12">Dezembro</option>
+                                    </select>
+                                    <select id="examYear" onchange="updateExamReport()">
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Corpo do Relatório -->
+                            <div class="exam-body">
+                                <p class="exam-intro">
+                                    Após a conferência dos relatórios e lançamentos financeiros da tesouraria 
+                                    <strong id="examChurchName">Igreja Batista de Linhares</strong>.
+                                </p>
+
+                                <p class="exam-text">
+                                    Após análise da documentação apresentada, esta comissão verificou que os relatórios 
+                                    encaminhados para a conferência estão em ordem, havendo conciliação entre os 
+                                    comprovantes disponibilizados, extratos bancários e lançamentos da Tesouraria.
+                                </p>
+
+                                <p class="exam-conclusion">
+                                    Declaramos e constatamos a exatidão de todos os valores e documentos lançados; 
+                                    e por esse motivo <strong>NOSSO PARECER É PARA QUE SEJA ACEITO e APROVADO OS 
+                                    RELATÓRIOS CONFORME A LEITURA.</strong>
+                                </p>
+                            </div>
+
+                            <!-- Data e Assinaturas -->
+                            <div class="exam-signatures">
+                                <div class="exam-date">
+                                    <span>_______ / _____________ / _______</span>
+                                </div>
+
+                                <div class="signature-line">
+                                    <div class="signature-box">
+                                        <div class="signature-space"></div>
+                                        <div class="signature-label">Relatora</div>
+                                    </div>
+                                </div>
+
+                                <div class="signature-grid">
+                                    <div class="signature-box">
+                                        <div class="signature-space"></div>
+                                        <div class="signature-label">Membro</div>
+                                    </div>
+                                    <div class="signature-box">
+                                        <div class="signature-space"></div>
+                                        <div class="signature-label">Membro</div>
+                                    </div>
+                                </div>
+
+                                <div class="signature-grid">
+                                    <div class="signature-box">
+                                        <div class="signature-space"></div>
+                                        <div class="signature-label">Membro</div>
+                                    </div>
+                                    <div class="signature-box">
+                                        <div class="signature-space"></div>
+                                        <div class="signature-label">Membro</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -1347,20 +2036,66 @@
                             <option value="">Selecione a categoria</option>
                             <!-- Income categories -->
                             <optgroup label="Receitas" id="incomeCategories" style="display: none;">
-                                <option value="Doações">Doações</option>
                                 <option value="Dízimos">Dízimos</option>
-                                <option value="Ofertas">Ofertas</option>
+                                <option value="PIX / Transferência">PIX / Transferência</option>
+                                <option value="Doações">Doações</option>
+                                <option value="Escola Bíblica">Escola Bíblica</option>
                                 <option value="Eventos">Eventos</option>
-                                <option value="Outros">Outros</option>
+                                <option value="Missões">Missões</option>
+                                <option value="Venda/Aluguel de Imóveis">Venda/Aluguel de Imóveis</option>
+                                <option value="Entradas Não Operacionais">Entradas Não Operacionais</option>
                             </optgroup>
                             <!-- Expense categories -->
-                            <optgroup label="Despesas" id="expenseCategories" style="display: none;">
-                                <option value="Utilidades">Utilidades</option>
+                            <optgroup label="Despesas Operacionais" id="expenseCategories" style="display: none;">
+                                <option value="Água">Água</option>
+                                <option value="Energia">Energia</option>
+                                <option value="Telefone">Telefone</option>
+                                <option value="Internet">Internet</option>
+                                <option value="Combustível">Combustível</option>
                                 <option value="Manutenção">Manutenção</option>
+                                <option value="Limpeza">Limpeza</option>
+                                <option value="Segurança">Segurança</option>
+                                <option value="Aluguel">Aluguel</option>
+                            </optgroup>
+                            <optgroup label="Despesas Pessoal" id="expensePersonnelCategories" style="display: none;">
                                 <option value="Salários">Salários</option>
-                                <option value="Material">Material</option>
-                                <option value="Eventos">Eventos</option>
-                                <option value="Outros">Outros</option>
+                                <option value="Ministério Pastoral">Ministério Pastoral</option>
+                                <option value="Ministério Adoração">Ministério Adoração</option>
+                                <option value="Ministério Infantil / EBD">Ministério Infantil / EBD</option>
+                                <option value="FGTS">FGTS</option>
+                                <option value="INSS">INSS</option>
+                                <option value="Férias">Férias</option>
+                                <option value="13º Salário">13º Salário</option>
+                                <option value="IRPF / Outros Impostos">IRPF / Outros Impostos</option>
+                            </optgroup>
+                            <optgroup label="Despesas Administrativas" id="expenseAdminCategories" style="display: none;">
+                                <option value="Material Didático e Caneta">Material Didático e Caneta</option>
+                                <option value="Material de Apoio">Material de Apoio</option>
+                                <option value="Impressões">Impressões</option>
+                                <option value="Alunos">Alunos</option>
+                                <option value="Taxas / Multas">Taxas / Multas</option>
+                            </optgroup>
+                            <optgroup label="Despesas Departamentos" id="expenseDeptCategories" style="display: none;">
+                                <option value="Ministério Louvor / Música">Ministério Louvor / Música</option>
+                                <option value="Ministério Infantil / EBD">Ministério Infantil / EBD</option>
+                                <option value="Ministério Jovens">Ministério Jovens</option>
+                                <option value="Ministério Predial">Ministério Predial</option>
+                                <option value="Ministério Mulheres">Ministério Mulheres</option>
+                                <option value="Auxílio de Irmãos/ãos">Auxílio de Irmãos/ãos</option>
+                            </optgroup>
+                            <optgroup label="Despesas Veículos" id="expenseVehicleCategories" style="display: none;">
+                                <option value="Combustível">Combustível</option>
+                                <option value="Manutenção">Manutenção</option>
+                                <option value="Impostos Veículos">Impostos Veículos</option>
+                                <option value="Seguro">Seguro</option>
+                            </optgroup>
+                            <optgroup label="Despesas Contábeis" id="expenseAccountCategories" style="display: none;">
+                                <option value="Contador / Despesa Contábil">Contador / Despesa Contábil</option>
+                                <option value="Obras / Reformas / Móveis">Obras / Reformas / Móveis</option>
+                                <option value="Compra de Imóveis">Compra de Imóveis</option>
+                                <option value="Impostos">Impostos</option>
+                                <option value="Seguros">Seguros</option>
+                                <option value="Despesas Diversas">Despesas Diversas</option>
                             </optgroup>
                         </select>
                     </div>

@@ -1,0 +1,247 @@
+/* Treasury Report Styles - Professional Layout */
+
+.treasury-report-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Cabeçalho do Relatório */
+.treasury-report-header {
+    background: linear-gradient(135deg, #3b5998 0%, #2d4373 100%);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.report-title-section {
+    flex: 1;
+}
+
+.report-title-section h2 {
+    margin: 0 0 15px 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.report-month-selector select {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.report-month-selector select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.report-month-selector select option {
+    background: #3b5998;
+    color: white;
+}
+
+/* Summary Box */
+.report-summary-box {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 6px;
+    padding: 15px 20px;
+    min-width: 280px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row.summary-final {
+    margin-top: 5px;
+    padding-top: 12px;
+    border-top: 2px solid #3b5998;
+}
+
+.summary-label {
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+}
+
+.summary-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d4373;
+    font-family: 'Courier New', monospace;
+}
+
+.summary-final .summary-value {
+    color: #1a5490;
+    font-size: 16px;
+}
+
+/* Tabela de Lançamentos */
+.treasury-table-wrapper {
+    overflow-x: auto;
+    background: white;
+}
+
+.treasury-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: auto;
+    min-width: 1200px;
+}
+
+.treasury-table thead {
+    background: linear-gradient(135deg, #4a6fa5 0%, #3b5998 100%);
+    color: white;
+}
+
+.treasury-table thead th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+}
+
+.treasury-table thead th:last-child {
+    border-right: none;
+}
+
+.treasury-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background 0.2s;
+}
+
+.treasury-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.treasury-table tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+
+.treasury-table tbody tr:nth-child(even):hover {
+    background: #f0f2f5;
+}
+
+.treasury-table tbody td {
+    padding: 10px 8px;
+    color: #333;
+    border-right: 1px solid #e8e8e8;
+    white-space: nowrap;
+}
+
+.treasury-table tbody td:last-child {
+    border-right: none;
+}
+
+/* Colunas específicas */
+.col-n {
+    width: 40px;
+    text-align: center;
+}
+
+.col-data {
+    width: 100px;
+    text-align: center;
+}
+
+.col-conta {
+    width: 80px;
+}
+
+.col-plano {
+    width: 150px;
+}
+
+.col-descricao {
+    min-width: 200px;
+}
+
+.col-documento {
+    width: 90px;
+    text-align: center;
+}
+
+.col-entrada,
+.col-saida,
+.col-saldo {
+    width: 110px;
+    text-align: right;
+}
+
+/* Alinhamentos */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+    font-family: 'Courier New', monospace;
+}
+
+.text-left {
+    text-align: left;
+}
+
+/* Valores em destaque */
+.treasury-table tbody td strong {
+    color: #1a5490;
+    font-weight: 700;
+}
+
+/* Responsivo */
+@media (max-width: 1200px) {
+    .treasury-report-header {
+        flex-direction: column;
+    }
+
+    .report-summary-box {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .treasury-table {
+        font-size: 11px;
+    }
+
+    .treasury-table thead th,
+    .treasury-table tbody td {
+        padding: 8px 5px;
+    }
+
+    .report-title-section h2 {
+        font-size: 16px;
+    }
+
+    .summary-label {
+        font-size: 12px;
+    }
+
+    .summary-value {
+        font-size: 13px;
+    }
+}

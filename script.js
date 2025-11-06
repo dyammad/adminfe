@@ -28,6 +28,236 @@ document.addEventListener('DOMContentLoaded', function() {
             updateDashboard();
         }, 100);
     }
+
+// Função para gerar dados simulados para o ano inteiro
+function generateYearTransactions() {
+    const transactions = [];
+    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    
+    months.forEach(month => {
+        // Dízimos e Ofertas (4 domingos + 2 quartas por mês)
+        transactions.push(
+            { date: `2025-${month}-01`, description: 'Energia', type: 'expense', category: 'Energia', plano: '22', conta: 'Sicoob', documento: 'Nota', amount: 1287.01 },
+            { date: `2025-${month}-01`, description: 'Dízimos PIX', type: 'income', category: 'PIX / Transferência', plano: '111', conta: 'Sicoob', documento: 'Extrato', amount: 608.00 },
+            { date: `2025-${month}-01`, description: 'Dízimos PIX', type: 'income', category: 'PIX / Transferência', plano: '111', conta: 'Sicoob', documento: 'Extrato', amount: 114.90 },
+            { date: `2025-${month}-01`, description: 'Dízimos PIX', type: 'income', category: 'PIX / Transferência', plano: '111', conta: 'Sicoob', documento: 'Extrato', amount: 900.00 },
+            { date: `2025-${month}-01`, description: 'Papelaria', type: 'expense', category: 'Material Escritório', plano: '41', conta: 'Sicoob', documento: 'Nota', amount: 126.40 },
+            { date: `2025-${month}-01`, description: 'Pr. J.Fernando - Ajuda Custo Combustível', type: 'expense', category: 'Ministério Pastoral', plano: '30', conta: 'Sicoob', documento: 'Recibo', amount: 300.00 },
+            { date: `2025-${month}-01`, description: 'Contabilidade Jan/25', type: 'expense', category: 'Contabilidade', plano: '26', conta: 'Sicoob', documento: 'RPA', amount: 636.00 },
+            { date: `2025-${month}-01`, description: 'Abateste', type: 'expense', category: 'Associações', plano: '43', conta: 'Sicoob', documento: 'Extrato', amount: 121.00 },
+            { date: `2025-${month}-03`, description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', plano: '111', conta: 'Sicoob', documento: 'Nota', amount: Math.round((2500 + Math.random() * 500) * 100) / 100 },
+            { date: `2025-${month}-06`, description: 'Dízimos - Culto Quarta', type: 'income', category: 'Dízimos', plano: '111', conta: 'Sicoob', documento: 'Extrato', amount: Math.round((1800 + Math.random() * 400) * 100) / 100 },
+            { date: `2025-${month}-10`, description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', plano: '111', conta: 'Sicoob', documento: 'Nota', amount: Math.round((3200 + Math.random() * 600) * 100) / 100 },
+            { date: `2025-${month}-13`, description: 'Dízimos - Culto Quarta', type: 'income', category: 'Dízimos', plano: '111', conta: 'Sicoob', documento: 'Extrato', amount: Math.round((2100 + Math.random() * 400) * 100) / 100 },
+            { date: `2025-${month}-17`, description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', plano: '111', conta: 'Sicoob', documento: 'Nota', amount: Math.round((2800 + Math.random() * 500) * 100) / 100 },
+            { date: `2025-${month}-24`, description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', plano: '111', conta: 'Sicoob', documento: 'Nota', amount: Math.round((3100 + Math.random() * 600) * 100) / 100 },
+            { date: `2025-${month}-05`, description: 'Ofertas - Campanhas de Missões', type: 'income', category: 'Ofertas', plano: '112', conta: 'Sicoob', documento: 'Nota', amount: Math.round((1200 + Math.random() * 300) * 100) / 100 },
+            { date: `2025-${month}-12`, description: 'Ofertas - Escola Bíblica', type: 'income', category: 'Ofertas', plano: '112', conta: 'Sicoob', documento: 'Nota', amount: Math.round((600 + Math.random() * 200) * 100) / 100 },
+            { date: `2025-${month}-19`, description: 'Ofertas - Campanhas de Missões', type: 'income', category: 'Ofertas', plano: '112', conta: 'Sicoob', documento: 'Nota', amount: Math.round((1500 + Math.random() * 400) * 100) / 100 },
+            { date: `2025-${month}-26`, description: 'Ofertas - Evento Especial', type: 'income', category: 'Ofertas', plano: '112', conta: 'Sicoob', documento: 'Nota', amount: Math.round((2000 + Math.random() * 500) * 100) / 100 }
+        );
+        
+        // Doações (3-4 por mês)
+        transactions.push(
+            { date: `2025-${month}-08`, description: 'Doação - Família Silva', type: 'income', category: 'Doações', plano: '113', conta: 'Sicoob', documento: 'Recibo', amount: Math.round((800 + Math.random() * 400) * 100) / 100 },
+            { date: `2025-${month}-15`, description: 'Doação - Família Santos', type: 'income', category: 'Doações', plano: '113', conta: 'Sicoob', documento: 'Recibo', amount: Math.round((500 + Math.random() * 300) * 100) / 100 },
+            { date: `2025-${month}-22`, description: 'Doação - Família Oliveira', type: 'income', category: 'Doações', plano: '113', conta: 'Sicoob', documento: 'Recibo', amount: Math.round((1000 + Math.random() * 500) * 100) / 100 },
+            { date: `2025-${month}-28`, description: 'Doação - Família Costa', type: 'income', category: 'Doações', plano: '113', conta: 'Sicoob', documento: 'Recibo', amount: Math.round((750 + Math.random() * 350) * 100) / 100 }
+        );
+        
+        // Despesas Fixas
+        transactions.push(
+            { date: `2025-${month}-05`, description: 'Salário - Pastor Principal', type: 'expense', category: 'Salários', plano: '31', conta: 'Sicoob', documento: 'Recibo', amount: 3500 },
+            { date: `2025-${month}-05`, description: 'Salário - Secretária', type: 'expense', category: 'Salários', plano: '31', conta: 'Sicoob', documento: 'Recibo', amount: 2000 },
+            { date: `2025-${month}-05`, description: 'Salário - Ministério Infantil', type: 'expense', category: 'Salários', plano: '31', conta: 'Sicoob', documento: 'Recibo', amount: 1500 },
+            { date: `2025-${month}-05`, description: 'Salário - Tesoureiro', type: 'expense', category: 'Salários', plano: '31', conta: 'Sicoob', documento: 'Recibo', amount: 1800 },
+            { date: `2025-${month}-10`, description: 'Energia Elétrica', type: 'expense', category: 'Energia', plano: '22', conta: 'Sicoob', documento: 'Nota', amount: Math.round((450 + Math.random() * 150) * 100) / 100 },
+            { date: `2025-${month}-15`, description: 'Água e Esgoto', type: 'expense', category: 'Água', plano: '23', conta: 'Sicoob', documento: 'Nota', amount: Math.round((320 + Math.random() * 100) * 100) / 100 },
+            { date: `2025-${month}-12`, description: 'Internet e Telefone', type: 'expense', category: 'Internet', plano: '24', conta: 'Sicoob', documento: 'Nota', amount: Math.round((280 + Math.random() * 80) * 100) / 100 },
+            { date: `2025-${month}-20`, description: 'Aluguel do Salão', type: 'expense', category: 'Aluguel', plano: '21', conta: 'Sicoob', documento: 'Recibo', amount: 1500 }
+        );
+        
+        // Despesas Variáveis
+        transactions.push(
+            { date: `2025-${month}-07`, description: 'Manutenção do Templo', type: 'expense', category: 'Manutenção', plano: '42', conta: 'Sicoob', documento: 'Nota', amount: Math.round((1200 + Math.random() * 800) * 100) / 100 },
+            { date: `2025-${month}-11`, description: 'Material de Limpeza', type: 'expense', category: 'Limpeza', plano: '40', conta: 'Sicoob', documento: 'Nota', amount: Math.round((350 + Math.random() * 150) * 100) / 100 },
+            { date: `2025-${month}-14`, description: 'Combustível - Veículo', type: 'expense', category: 'Combustível', plano: '25', conta: 'Sicoob', documento: 'Nota', amount: Math.round((400 + Math.random() * 200) * 100) / 100 },
+            { date: `2025-${month}-18`, description: 'Impressoras e Papel', type: 'expense', category: 'Impressões', plano: '41', conta: 'Sicoob', documento: 'Nota', amount: Math.round((280 + Math.random() * 120) * 100) / 100 },
+            { date: `2025-${month}-21`, description: 'Segurança - Vigilante', type: 'expense', category: 'Segurança', plano: '44', conta: 'Sicoob', documento: 'Recibo', amount: 800 },
+            { date: `2025-${month}-25`, description: 'Material de Apoio', type: 'expense', category: 'Material Didático', plano: '41', conta: 'Sicoob', documento: 'Nota', amount: Math.round((450 + Math.random() * 200) * 100) / 100 }
+        );
+    });
+    
+    return transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+// Gerar dados simulados para o ano
+const simulatedTransactions = generateYearTransactions();
+
+// Manter compatibilidade com código antigo
+const oldSimulatedTransactions = [
+    { date: '2025-11-01', description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', amount: 2500 },
+    { date: '2025-11-02', description: 'Ofertas - Campanhas de Missões', type: 'income', category: 'Ofertas', amount: 1200 },
+    { date: '2025-11-03', description: 'Energia Elétrica', type: 'expense', category: 'Água', amount: 450 },
+    { date: '2025-11-04', description: 'Salário - Pastor Principal', type: 'expense', category: 'Salários', amount: 3500 },
+    { date: '2025-11-05', description: 'Doação - Família Silva', type: 'income', category: 'Doações', amount: 800 },
+    { date: '2025-11-06', description: 'Manutencao do Templo', type: 'expense', category: 'Manutenção', amount: 1200 },
+    { date: '2025-11-07', description: 'Dízimos - Culto Quarta', type: 'income', category: 'Dízimos', amount: 1800 },
+    { date: '2025-11-08', description: 'Material de Limpeza', type: 'expense', category: 'Limpeza', amount: 350 },
+    { date: '2025-11-09', description: 'Ofertas - Escola Bíblia', type: 'income', category: 'Ofertas', amount: 600 },
+    { date: '2025-11-10', description: 'Internet e Telefone', type: 'expense', category: 'Internet', amount: 280 },
+    { date: '2025-11-11', description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', amount: 3200 },
+    { date: '2025-11-12', description: 'Salário - Secretaria', type: 'expense', category: 'Salários', amount: 2000 },
+    { date: '2025-11-13', description: 'Doação - Família Santos', type: 'income', category: 'Doações', amount: 500 },
+    { date: '2025-11-14', description: 'Combustivel - Veículo', type: 'expense', category: 'Combustível', amount: 400 },
+    { date: '2025-11-15', description: 'Ofertas - Campanhas de Missões', type: 'income', category: 'Ofertas', amount: 1500 },
+    { date: '2025-11-16', description: 'Salário - Ministério Infantil', type: 'expense', category: 'Salários', amount: 1500 },
+    { date: '2025-11-17', description: 'Dízimos - Culto Quarta', type: 'income', category: 'Dízimos', amount: 2100 },
+    { date: '2025-11-18', description: 'Impressoras e Papel', type: 'expense', category: 'Impressões', amount: 280 },
+    { date: '2025-11-19', description: 'Doação - Família Oliveira', type: 'income', category: 'Doações', amount: 1000 },
+    { date: '2025-11-20', description: 'Segurança - Vigilante', type: 'expense', category: 'Segurança', amount: 800 },
+    { date: '2025-11-21', description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', amount: 2800 },
+    { date: '2025-11-22', description: 'Ofertas - Evento Especial', type: 'income', category: 'Ofertas', amount: 2000 },
+    { date: '2025-11-23', description: 'Aluguel do Salão', type: 'expense', category: 'Aluguel', amount: 1500 },
+    { date: '2025-11-24', description: 'Material de Apoio', type: 'expense', category: 'Material Didático', amount: 450 },
+    { date: '2025-11-25', description: 'Doação - Família Costa', type: 'income', category: 'Doações', amount: 750 },
+    { date: '2025-11-26', description: 'Salário - Tesoureiro', type: 'expense', category: 'Salários', amount: 1800 },
+    { date: '2025-11-27', description: 'Dízimos - Culto Quarta', type: 'income', category: 'Dízimos', amount: 1900 },
+    { date: '2025-11-28', description: 'Ofertas - Campanhas de Missões', type: 'income', category: 'Ofertas', amount: 1300 },
+    { date: '2025-11-29', description: 'Água e Esgoto', type: 'expense', category: 'Água', amount: 320 },
+    { date: '2025-11-30', description: 'Dízimos - Culto Domingo', type: 'income', category: 'Dízimos', amount: 3100 },
+];
+
+// Relatório de movimentações com saldo acumulado
+window.loadTreasuryReport = function(selectedMonth = null) {
+    console.log('=== loadTreasuryReport chamada ===' );
+    console.log('selectedMonth:', selectedMonth);
+    
+    const summaryPrev = document.getElementById('reportPrevBalance');
+    const summaryIn = document.getElementById('reportTotalIncome');
+    const summaryOut = document.getElementById('reportTotalExpense');
+    const summaryNext = document.getElementById('reportNextBalance');
+    const tbody = document.querySelector('#treasuryReportTable tbody');
+
+    console.log('Elementos encontrados:');
+    console.log('- summaryPrev:', summaryPrev);
+    console.log('- summaryIn:', summaryIn);
+    console.log('- summaryOut:', summaryOut);
+    console.log('- summaryNext:', summaryNext);
+    console.log('- tbody:', tbody);
+
+    // Se a seção não existe no DOM (não está na página atual), não faz nada
+    if (!tbody || !summaryPrev || !summaryIn || !summaryOut || !summaryNext) {
+        console.error('ERRO: Elementos não encontrados!');
+        return;
+    }
+
+    // Usar dados simulados se não houver transações
+    const dataToUse = transactions.length > 0 ? transactions : simulatedTransactions;
+    console.log('Dados a usar:', dataToUse.length, 'transações');
+    console.log('Primeira transação:', dataToUse[0]);
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    
+    // Se selectedMonth não foi passado, pegar do select
+    let monthIndex;
+    if (selectedMonth !== null) {
+        monthIndex = parseInt(selectedMonth);
+    } else {
+        const selectElement = document.getElementById('treasuryMonthFilter');
+        // O valor do select é o índice do mês (0 a 11)
+        monthIndex = selectElement ? parseInt(selectElement.value) : now.getMonth();
+    }
+    
+    // O ano está fixo em 2025 no HTML, mas vamos usar o ano atual para o cálculo
+    // Para garantir que a data seja criada corretamente, vamos usar o ano atual
+    // A menos que o usuário tenha um seletor de ano, o que não parece ser o caso aqui.
+    // Vamos assumir o ano 2025, que é o ano dos dados simulados.
+    const year = 2025; 
+    
+    const startOfMonth = new Date(year, monthIndex, 1);
+    const startOfNextMonth = new Date(year, monthIndex + 1, 1);
+    
+    console.log('Filtro de data:');
+    console.log('- Mês selecionado:', monthIndex);
+    console.log('- Início do mês:', startOfMonth);
+    console.log('- Fim do mês:', startOfNextMonth);
+
+    // Saldo anterior: todas as transações antes do início do mês atual
+    const prevBalance = dataToUse.reduce((acc, t) => {
+
+        // A data da transação precisa ser convertida para um objeto Date
+        const d = new Date(t.date + 'T00:00:00'); 
+        if (d < startOfMonth) {
+            return acc + (t.type === 'income' ? t.amount : -t.amount);
+        }
+        return acc;
+    }, 5000); // Saldo inicial de R$ 5.000
+
+    // Transações do mês corrente
+    const monthTx = dataToUse
+        .filter(t => {
+            // A data da transação precisa ser convertida para um objeto Date
+            // A string de data no formato 'YYYY-MM-DD' é interpretada como UTC, 
+            // o que pode causar problemas de fuso horário.
+            // Vamos garantir que a comparação seja feita corretamente.
+            const d = new Date(t.date + 'T00:00:00'); 
+            return d >= startOfMonth && d < startOfNextMonth;
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const totalIncome = monthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+    const totalExpense = monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+    const nextBalance = prevBalance + totalIncome - totalExpense;
+
+    console.log('Valores calculados:');
+    console.log('- Saldo anterior:', prevBalance);
+    console.log('- Total entradas:', totalIncome);
+    console.log('- Total saídas:', totalExpense);
+    console.log('- Saldo final:', nextBalance);
+    console.log('- Transações do mês:', monthTx.length);
+
+    summaryPrev.textContent = prevBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    summaryIn.textContent = totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    summaryOut.textContent = totalExpense.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    summaryNext.textContent = nextBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    
+    console.log('Valores atribuídos aos elementos HTML');
+
+    // Montar tabela
+    console.log('Montando tabela com', monthTx.length, 'transações');
+    tbody.innerHTML = '';
+    
+    if (monthTx.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px;">Nenhuma movimentação encontrada para este mês</td></tr>';
+        return;
+    }
+    
+    let running = prevBalance;
+    monthTx.forEach((t, idx) => {
+        running += (t.type === 'income' ? t.amount : -t.amount);
+        const tr = document.createElement('tr');
+        
+        // Usar campos do objeto ou valores padrão
+        const conta = t.conta || 'Sicoob';
+        const plano = t.plano || (t.type === 'income' ? '111' : '31');
+        const documento = t.documento || (t.type === 'income' ? 'Nota' : 'Recibo');
+        
+        tr.innerHTML = `
+            <td class="text-center">${idx + 1}</td>
+            <td class="text-center">${new Date(t.date).toLocaleDateString('pt-BR')}</td>
+            <td>${conta}</td>
+            <td>${plano}</td>
+            <td>${t.description || '-'}</td>
+            <td>${documento}</td>
+            <td class="text-right">${t.type === 'income' ? t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}</td>
+            <td class="text-right">${t.type === 'expense' ? t.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}</td>
+            <td class="text-right"><strong>${running.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 });
 
 function initializeApp() {
@@ -168,6 +398,11 @@ async function handleLogin(e) {
         // Atualizar interface baseada nas permissões
         updateUIBasedOnPermissions();
         
+        // Atualizar visibilidade do menu admin
+        if (typeof updateAdminMenuVisibility === 'function') {
+            updateAdminMenuVisibility();
+        }
+        
         // Aguardar um pouco para garantir que os dados foram carregados
         setTimeout(() => {
             updateDashboard();
@@ -286,6 +521,10 @@ function updateUIBasedOnPermissions() {
         { element: '[data-section="events"]', permission: 'events.view' },
         { element: '[data-section="pastor-agenda"]', permission: 'agenda.view' },
         { element: '[data-section="treasury"]', permission: 'treasury.view' },
+        { element: '[data-section="treasury-report"]', permission: 'treasury.view' },
+        { element: '[data-section="missions-report"]', permission: 'treasury.view' },
+        { element: '[data-section="dre-report"]', permission: 'treasury.view' },
+        { element: '[data-section="exam-report"]', permission: 'treasury.view' },
         { element: '[data-section="prayer-requests"]', permission: 'prayers.view' },
         { element: '[data-section="baptisms"]', permission: 'baptisms.view' }
         // Doações sempre visível para todos (membros podem doar)
@@ -649,6 +888,7 @@ function navigateToSection(sectionId) {
     // Update page title
     const titles = {
         'dashboard': 'Dashboard',
+        'church-management': 'Cadastro de Novas Igrejas',
         'members-active': 'Membros Ativos',
         'members-inactive': 'Membros Inativos',
         'members-visitors': 'Visitantes',
@@ -659,6 +899,10 @@ function navigateToSection(sectionId) {
         'events': 'Eventos',
         'pastor-agenda': 'Agenda do Pastor',
         'treasury': 'Tesouraria',
+        'treasury-report': 'Relatório de Movimentações',
+        'missions-report': 'Relatório de Campanhas de Missões',
+        'dre-report': 'Relatório Anual de Contas (DRE)',
+        'exam-report': 'Relatório de Exame de Contas',
         'prayer-requests': 'Pedidos de Oração',
         'baptisms': 'Batismos',
         'donations': 'Doações',
@@ -674,6 +918,9 @@ function loadSectionData(sectionId) {
     switch(sectionId) {
         case 'dashboard':
             updateDashboard();
+            break;
+        case 'church-management':
+            loadChurchManagement();
             break;
         case 'members-active':
             loadActiveMembers();
@@ -704,6 +951,18 @@ function loadSectionData(sectionId) {
             break;
         case 'treasury':
             loadTreasury();
+            break;
+        case 'treasury-report':
+            loadTreasuryReport();
+            break;
+        case 'missions-report':
+            loadMissionsReport();
+            break;
+        case 'dre-report':
+            loadDREReport();
+            break;
+        case 'exam-report':
+            updateExamReport();
             break;
         case 'prayer-requests':
             loadPrayerRequests();
@@ -1254,6 +1513,8 @@ function handleTransactionSubmit(e) {
     }
     
     loadTreasury();
+    // Atualiza o relatório caso o usuário esteja visualizando
+    loadTreasuryReport();
     updateDashboard();
     closeTransactionModal();
 }
@@ -2166,17 +2427,37 @@ function closeTransactionModal() {
 
 function handleTransactionTypeChange() {
     const type = document.getElementById('transactionType').value;
-    const categorySelect = document.getElementById('transactionCategory');
     
-    const incomeCategories = ['Dízimos', 'Ofertas', 'Doações', 'Eventos', 'Outros'];
-    const expenseCategories = ['Manutenção', 'Utilidades', 'Materiais', 'Eventos', 'Salários', 'Pagamentos', 'Outros'];
+    // Mostrar/ocultar optgroups baseado no tipo
+    const incomeGroup = document.getElementById('incomeCategories');
+    const expenseGroups = [
+        document.getElementById('expenseCategories'),
+        document.getElementById('expensePersonnelCategories'),
+        document.getElementById('expenseAdminCategories'),
+        document.getElementById('expenseDeptCategories'),
+        document.getElementById('expenseVehicleCategories'),
+        document.getElementById('expenseAccountCategories')
+    ];
     
-    const categories = type === 'income' ? incomeCategories : expenseCategories;
+    if (type === 'income') {
+        incomeGroup.style.display = '';
+        expenseGroups.forEach(group => {
+            if (group) group.style.display = 'none';
+        });
+    } else if (type === 'expense') {
+        incomeGroup.style.display = 'none';
+        expenseGroups.forEach(group => {
+            if (group) group.style.display = '';
+        });
+    } else {
+        incomeGroup.style.display = 'none';
+        expenseGroups.forEach(group => {
+            if (group) group.style.display = 'none';
+        });
+    }
     
-    categorySelect.innerHTML = '';
-    categories.forEach(category => {
-        categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
-    });
+    // Resetar seleção
+    document.getElementById('transactionCategory').value = '';
 }
 
 // Edit functions
@@ -2926,4 +3207,586 @@ function requestBaptism(id) {
     if (document.getElementById('baptisms').classList.contains('active')) {
         loadBaptisms();
     }
+}
+
+// Missions Report Functions
+let missionsData = {
+    2025: {
+        estaduais: {
+            alvo: 2000.00,
+            alcancado: 6152.00,
+            detalhes: {
+                adultos: 4485.00,
+                adolescentes: 630.00,
+                infantil: 792.00
+            }
+        },
+        nacionais: {
+            alvo: 5000.00,
+            alcancado: 7366.00,
+            detalhes: {
+                setembro: 220.00,
+                outubro: 7146.00
+            }
+        },
+        mundiais: {
+            alvo: 5000.00,
+            alcancado: 8760.00,
+            detalhes: {
+                adultos: 4307.80,
+                adolescentes: 1082.00,
+                infantil: 1180.20
+            }
+        },
+        enviados: 15660.00
+    },
+    2024: {
+        estaduais: {
+            alvo: 1800.00,
+            alcancado: 5200.00,
+            detalhes: {
+                adultos: 3800.00,
+                adolescentes: 550.00,
+                infantil: 850.00
+            }
+        },
+        nacionais: {
+            alvo: 4500.00,
+            alcancado: 6500.00,
+            detalhes: {
+                setembro: 180.00,
+                outubro: 6320.00
+            }
+        },
+        mundiais: {
+            alvo: 4500.00,
+            alcancado: 7800.00,
+            detalhes: {
+                adultos: 3900.00,
+                adolescentes: 980.00,
+                infantil: 1020.00
+            }
+        },
+        enviados: 14000.00
+    },
+    2023: {
+        estaduais: {
+            alvo: 1500.00,
+            alcancado: 4800.00,
+            detalhes: {
+                adultos: 3200.00,
+                adolescentes: 500.00,
+                infantil: 1100.00
+            }
+        },
+        nacionais: {
+            alvo: 4000.00,
+            alcancado: 5900.00,
+            detalhes: {
+                setembro: 150.00,
+                outubro: 5750.00
+            }
+        },
+        mundiais: {
+            alvo: 4000.00,
+            alcancado: 7200.00,
+            detalhes: {
+                adultos: 3600.00,
+                adolescentes: 900.00,
+                infantil: 900.00
+            }
+        },
+        enviados: 12500.00
+    }
+};
+
+function loadMissionsReport() {
+    const year = document.getElementById('missionsYearFilter')?.value || '2025';
+    const data = missionsData[year];
+    
+    if (!data) return;
+    
+    // Atualizar cards de campanhas
+    document.getElementById('estaduaisAlvo').textContent = formatCurrency(data.estaduais.alvo);
+    document.getElementById('estaduaisAlcancado').textContent = formatCurrency(data.estaduais.alcancado);
+    
+    document.getElementById('nacionaisAlvo').textContent = formatCurrency(data.nacionais.alvo);
+    document.getElementById('nacionaisAlcancado').textContent = formatCurrency(data.nacionais.alcancado);
+    
+    document.getElementById('mundiaisAlvo').textContent = formatCurrency(data.mundiais.alvo);
+    document.getElementById('mundiaisAlcancado').textContent = formatCurrency(data.mundiais.alcancado);
+    
+    // Calcular totais
+    const totalAlcancado = data.estaduais.alcancado + data.nacionais.alcancado + data.mundiais.alcancado;
+    const totalAlvos = data.estaduais.alvo + data.nacionais.alvo + data.mundiais.alvo;
+    const saldo = totalAlcancado - data.enviados;
+    
+    document.getElementById('totalCampanhas').textContent = formatCurrency(totalAlcancado);
+    document.getElementById('totalAlvos').textContent = formatCurrency(totalAlvos);
+    document.getElementById('saldoMissoes').textContent = formatCurrency(saldo);
+    document.getElementById('totalEnviados').textContent = formatCurrency(data.enviados);
+    
+    // Atualizar detalhes - Estaduais
+    document.getElementById('estaduaisYear').textContent = year;
+    document.getElementById('estaduaisTotal').textContent = formatCurrency(data.estaduais.alcancado);
+    const estaduaisDetails = document.getElementById('estaduaisDetails');
+    estaduaisDetails.innerHTML = `
+        <div class="detail-item">
+            <span>Adultos</span>
+            <span>${formatCurrency(data.estaduais.detalhes.adultos)}</span>
+        </div>
+        <div class="detail-item">
+            <span>Adolescentes</span>
+            <span>${formatCurrency(data.estaduais.detalhes.adolescentes)}</span>
+        </div>
+        <div class="detail-item">
+            <span>Ministério Infantil</span>
+            <span>${formatCurrency(data.estaduais.detalhes.infantil)}</span>
+        </div>
+    `;
+    
+    // Atualizar detalhes - Nacionais
+    document.getElementById('nacionaisYear').textContent = year;
+    document.getElementById('nacionaisTotal').textContent = formatCurrency(data.nacionais.alcancado);
+    const nacionaisDetails = document.getElementById('nacionaisDetails');
+    nacionaisDetails.innerHTML = `
+        <div class="detail-item">
+            <span>Setembro</span>
+            <span>${formatCurrency(data.nacionais.detalhes.setembro)}</span>
+        </div>
+        <div class="detail-item">
+            <span>Outubro</span>
+            <span>${formatCurrency(data.nacionais.detalhes.outubro)}</span>
+        </div>
+    `;
+    
+    // Atualizar detalhes - Mundiais
+    document.getElementById('mundiaisYear').textContent = year;
+    document.getElementById('mundiaisTotal').textContent = formatCurrency(data.mundiais.alcancado);
+    const mundiaisDetails = document.getElementById('mundiaisDetails');
+    mundiaisDetails.innerHTML = `
+        <div class="detail-item">
+            <span>Adultos</span>
+            <span>${formatCurrency(data.mundiais.detalhes.adultos)}</span>
+        </div>
+        <div class="detail-item">
+            <span>Adolescentes</span>
+            <span>${formatCurrency(data.mundiais.detalhes.adolescentes)}</span>
+        </div>
+        <div class="detail-item">
+            <span>Ministério Infantil</span>
+            <span>${formatCurrency(data.mundiais.detalhes.infantil)}</span>
+        </div>
+    `;
+}
+
+function formatCurrency(value) {
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2
+    }).format(value);
+}
+
+// DRE Annual Report Functions
+const dreData = {
+    2025: {
+        entradas: {
+            total: 329381.42,
+            meses: [22614.73, 18884.50, 40537.30, 44584.74, 24763.40, 38133.69, 30169.25, 29140.60, 39681.00, 40872.21, 0, 0],
+            subcategorias: {
+                'Saldo Mês Anterior': {
+                    total: 46350.98,
+                    meses: [3272.97, 7609.41, 3531.07, 14519.03, 6700.09, 8289.13, 10900.83, 3746.11, 2364.40, 10203.50, 1694.90, 1694.90],
+                    percent: 14.08
+                },
+                'Despesas Fixas': {
+                    total: 105458.66,
+                    meses: [12217.71, 11849.11, 9954.73, 9971.75, 10595.60, 10340.58, 11039.52, 9683.00, 9461.86, 9554.60, 0, 0],
+                    percent: 32.00
+                },
+                'Despesas Variáveis': {
+                    total: 46190.89,
+                    meses: [3806.53, 2621.85, 4768.66, 10136.01, 4986.63, 7011.98, 1312.40, 712.62, 5255.31, 7451.93, 0, 0],
+                    percent: 14.01
+                },
+                'Impostos': {
+                    total: 8334.07,
+                    meses: [871.14, 208.68, 0, 607.47, 7360.41, 791.26, 0, 0, 0, 704.78, 0, 0],
+                    percent: 2.53
+                },
+                'Despesas Eventuais': {
+                    total: 87536.08,
+                    meses: [3311.11, 71380.20, 36001.27, 33675.75, 1860.61, 875.15, 1166.65, 800.63, 869.93, 1000.00, 0, 0],
+                    percent: 26.56
+                },
+                'Despesas Totais': {
+                    total: 207323.10,
+                    meses: [16935.28, 36978.84, 50724.66, 42401.89, 18710.83, 19021.09, 13519.27, 34120.97, 16883.96, 13800.11, 0, 0],
+                    percent: 62.94
+                }
+            }
+        },
+        receitas: {
+            total: 393990.93,
+            meses: [22614.73, 37784.40, 64731.82, 44584.74, 28297.87, 38133.69, 30169.25, 42778.16, 43828.08, 40872.21, 0, 0],
+            subcategorias: {
+                'Dízimos': {
+                    total: 399280.92,
+                    meses: [22514.75, 18784.20, 40237.20, 39501.76, 29763.00, 38055.02, 26564.25, 28929.00, 39826.00, 29782.11, 0, 0],
+                    percent: 101.34
+                },
+                'PIX / Transferência': {
+                    total: 222630.42,
+                    meses: [15347.73, 14153.50, 37504.30, 26898.74, 19881.40, 25303.69, 20573.25, 20100.60, 29181.00, 18372.21, 0, 0],
+                    percent: 56.50
+                },
+                'Doações': {
+                    total: 83650.00,
+                    meses: [7267.00, 4631.00, 7623.00, 12603.00, 4882.00, 12860.00, 6421.00, 6193.00, 10171.00, 10389.00, 0, 0],
+                    percent: 21.23
+                },
+                'Ofertas': {
+                    total: 5000.00,
+                    meses: [0, 0, 0, 0, 0, 0, 0, 0, 0, 5000.00, 0, 0],
+                    percent: 1.27
+                }
+            }
+        },
+        saldoMes: {
+            total: 0,
+            meses: [7507.41, 3511.97, 14510.03, 8702.09, 8280.13, 10891.83, 3737.11, 2355.40, 10194.50, 1685.90, 1685.90, 1685.90]
+        }
+    }
+};
+
+function loadDREReport() {
+    const year = document.getElementById('dreYearFilter')?.value || '2025';
+    const data = dreData[year];
+    
+    if (!data) {
+        console.error('Dados não encontrados para o ano:', year);
+        return;
+    }
+    
+    const tbody = document.getElementById('dreTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    // Função auxiliar para formatar valores
+    const fmt = (val) => {
+        if (!val || val === 0) return '-';
+        return new Intl.NumberFormat('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(val);
+    };
+    
+    // ENTRADAS (Receitas)
+    tbody.innerHTML += `
+        <tr class="row-header">
+            <td>Entradas</td>
+            <td colspan="12" style="text-align: center;">REC</td>
+        </tr>
+    `;
+    
+    // Total de Entradas
+    tbody.innerHTML += createDRERow('Total', data.receitas.total, data.receitas.meses, '', 'row-total');
+    
+    // Subcategorias de Receitas
+    Object.keys(data.receitas.subcategorias).forEach(key => {
+        const cat = data.receitas.subcategorias[key];
+        tbody.innerHTML += createDRERow(key, cat.total, cat.meses, cat.percent, 'indent-1');
+    });
+    
+    // DESPESAS
+    tbody.innerHTML += `
+        <tr class="row-header">
+            <td>Despesas</td>
+            <td colspan="12" style="text-align: center;"></td>
+        </tr>
+    `;
+    
+    // Subcategorias de Despesas
+    Object.keys(data.entradas.subcategorias).forEach(key => {
+        const cat = data.entradas.subcategorias[key];
+        tbody.innerHTML += createDRERow(key, cat.total, cat.meses, cat.percent, 'indent-1');
+    });
+    
+    // Total de Despesas
+    tbody.innerHTML += createDRERow('Despesas Totais', data.entradas.total, data.entradas.meses, '', 'row-subtotal');
+    
+    // SALDO DO MÊS
+    tbody.innerHTML += createDRERow('Saldo próximo mês', data.saldoMes.total, data.saldoMes.meses, '', 'row-result');
+}
+
+function createDRERow(label, total, meses, percent, rowClass = '') {
+    const fmt = (val) => {
+        if (!val || val === 0) return '-';
+        return new Intl.NumberFormat('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(val);
+    };
+    
+    const percentStr = percent ? ` ${percent}%` : '';
+    
+    return `
+        <tr class="${rowClass}">
+            <td class="${rowClass.includes('indent') ? rowClass : ''}">${label}${percentStr}</td>
+            <td>${fmt(total)}</td>
+            ${meses.map(val => `<td>${fmt(val)}</td>`).join('')}
+        </tr>
+    `;
+}
+
+// Filtrar lançamentos por mês
+document.addEventListener('DOMContentLoaded', function() {
+    const lancamentoMesSelect = document.getElementById('lancamentoMes');
+    if (lancamentoMesSelect) {
+        lancamentoMesSelect.addEventListener('change', function() {
+            loadLancamentosPorMes(this.value);
+        });
+    }
+});
+
+function loadLancamentosPorMes(mes) {
+    if (!mes) return;
+    
+    const tbody = document.querySelector('#lancamentosTable tbody');
+    if (!tbody) return;
+    
+    // Filtrar transações do mês selecionado
+    const mesInt = parseInt(mes);
+    const lancamentos = transactions.filter(t => {
+        const date = new Date(t.date);
+        return date.getMonth() + 1 === mesInt;
+    });
+    
+    tbody.innerHTML = '';
+    
+    if (lancamentos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Nenhum lançamento encontrado para este mês</td></tr>';
+        return;
+    }
+    
+    lancamentos.forEach((lanc, idx) => {
+        const tipo = lanc.type === 'income' ? 'Receita' : 'Despesa';
+        const tipoClass = lanc.type === 'income' ? 'transaction-income' : 'transaction-expense';
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>${idx + 1}</td>
+                <td>${lanc.category || '-'}</td>
+                <td>${lanc.description || '-'}</td>
+                <td><span class="${tipoClass}">${tipo}</span></td>
+                <td class="${tipoClass}">${formatCurrency(lanc.amount)}</td>
+            </tr>
+        `;
+    });
+}
+
+// Exam Report Functions
+function updateExamReport() {
+    // Esta função pode ser expandida para atualizar dados dinâmicos
+    // Por enquanto, o relatório é estático com os textos padrão
+    console.log('Relatório de Exame de Contas atualizado');
+}
+
+function printExamReport() {
+    // Ocultar botões e elementos não necessários para impressão
+    const originalTitle = document.title;
+    document.title = 'Relatório de Exame de Contas';
+    
+    // Imprimir
+    window.print();
+    
+    // Restaurar título
+    document.title = originalTitle;
+}
+
+function exportExamReportPDF() {
+    // Verificar se a biblioteca html2pdf está carregada
+    if (typeof html2pdf === 'undefined') {
+        alert('Biblioteca de PDF não carregada. Por favor, recarregue a página.');
+        return;
+    }
+
+    // Obter o mês e ano selecionados
+    const month = document.getElementById('examMonth')?.selectedOptions[0]?.text || 'Outubro';
+    const year = document.getElementById('examYear')?.value || '2025';
+    
+    // Elemento a ser convertido
+    const element = document.querySelector('.exam-report-document');
+    
+    if (!element) {
+        alert('Erro: Documento não encontrado.');
+        return;
+    }
+
+    // Configurações do PDF
+    const opt = {
+        margin: [15, 15, 15, 15],
+        filename: `relatorio-exame-contas-${month}-${year}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            letterRendering: true,
+            logging: false
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    // Mostrar mensagem de carregamento
+    const loadingMsg = document.createElement('div');
+    loadingMsg.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px 40px; border-radius: 8px; z-index: 10000; font-size: 16px;';
+    loadingMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando PDF...';
+    document.body.appendChild(loadingMsg);
+
+    // Gerar e baixar o PDF
+    html2pdf().set(opt).from(element).save().then(() => {
+        document.body.removeChild(loadingMsg);
+    }).catch(error => {
+        console.error('Erro ao gerar PDF:', error);
+        document.body.removeChild(loadingMsg);
+        alert('Erro ao gerar PDF. Tente usar a opção "Imprimir" e salvar como PDF.');
+    });
+}
+
+// Cover Page Functions
+function showCoverPage() {
+    const coverContainer = document.getElementById('coverPageContainer');
+    const examContainer = document.querySelector('.exam-report-container');
+    
+    if (coverContainer && examContainer) {
+        coverContainer.style.display = 'block';
+        examContainer.style.display = 'none';
+        
+        // Sincronizar nome da igreja
+        syncChurchName();
+        
+        // Adicionar listener para sincronizar em tempo real
+        const churchNameInput = document.getElementById('coverChurchName');
+        if (churchNameInput) {
+            churchNameInput.addEventListener('input', syncChurchName);
+        }
+    }
+}
+
+function hideCoverPage() {
+    const coverContainer = document.getElementById('coverPageContainer');
+    const examContainer = document.querySelector('.exam-report-container');
+    
+    if (coverContainer && examContainer) {
+        coverContainer.style.display = 'none';
+        examContainer.style.display = 'block';
+    }
+}
+
+function syncChurchName() {
+    const churchNameInput = document.getElementById('coverChurchName');
+    const churchNameFooter = document.getElementById('coverChurchNameFooter');
+    
+    if (churchNameInput && churchNameFooter) {
+        churchNameFooter.textContent = churchNameInput.value || 'Igreja Batista';
+    }
+}
+
+function printCoverPage() {
+    // Adicionar classe ao body para controlar o que será impresso
+    document.body.classList.add('printing-cover');
+    
+    const originalTitle = document.title;
+    document.title = 'Capa - Relatório de Apresentação de Contas Financeiras';
+    
+    // Imprimir
+    window.print();
+    
+    // Restaurar
+    document.title = originalTitle;
+    document.body.classList.remove('printing-cover');
+}
+
+function exportCoverPagePDF() {
+    // Verificar se a biblioteca html2pdf está carregada
+    if (typeof html2pdf === 'undefined') {
+        alert('Biblioteca de PDF não carregada. Por favor, recarregue a página.');
+        return;
+    }
+
+    // Obter o mês e ano selecionados
+    const month = document.getElementById('coverMonth')?.value || 'Outubro';
+    const year = document.getElementById('coverYear')?.value || '2025';
+    
+    // Elemento a ser convertido
+    const element = document.querySelector('.cover-page');
+    
+    if (!element) {
+        alert('Erro: Capa não encontrada.');
+        return;
+    }
+
+    // Configurações do PDF
+    const opt = {
+        margin: 0,
+        filename: `capa-relatorio-${month}-${year}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,
+            letterRendering: true,
+            logging: false,
+            backgroundColor: '#c8d8e4'
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        }
+    };
+
+    // Mostrar mensagem de carregamento
+    const loadingMsg = document.createElement('div');
+    loadingMsg.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 20px 40px; border-radius: 8px; z-index: 10000; font-size: 16px;';
+    loadingMsg.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando PDF da Capa...';
+    document.body.appendChild(loadingMsg);
+
+    // Clonar elemento para não afetar a visualização
+    const clone = element.cloneNode(true);
+    
+    // Remover bordas dos inputs no clone
+    const inputs = clone.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        const value = input.value || input.textContent;
+        const span = document.createElement('span');
+        span.textContent = value;
+        span.style.cssText = input.style.cssText;
+        input.parentNode.replaceChild(span, input);
+    });
+
+    // Criar container temporário
+    const tempContainer = document.createElement('div');
+    tempContainer.style.cssText = 'position: absolute; left: -9999px; top: 0;';
+    tempContainer.appendChild(clone);
+    document.body.appendChild(tempContainer);
+
+    // Gerar e baixar o PDF
+    html2pdf().set(opt).from(clone).save().then(() => {
+        document.body.removeChild(loadingMsg);
+        document.body.removeChild(tempContainer);
+    }).catch(error => {
+        console.error('Erro ao gerar PDF:', error);
+        document.body.removeChild(loadingMsg);
+        document.body.removeChild(tempContainer);
+        alert('Erro ao gerar PDF. Tente usar a opção "Imprimir" e salvar como PDF.');
+    });
 }
